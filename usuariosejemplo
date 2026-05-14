@@ -1,0 +1,10 @@
+docker exec -it bunnies_db bash
+mariadb -u user_bunnies -p
+
+Contraseña: user_password
+
+Usuario: email@gmail.com
+Contraseña: 1111
+
+Usuario: email2@gmail.com
+Contraseña: 2222
