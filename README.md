@@ -1,6 +1,7 @@
 # Bunnies & Tea 🐰☕
 
 Este es mi proyecto para el módulo Proyecto intermodular II. He desarrollado un **idle game** ambientado en una cafetería de conejos. El objetivo principal ha sido crear una aplicación web completa, desde la base de datos hasta el despliegue.
+
 **Autora:** Irene Diges García  
 **Curso:** 2º DAW  
 **Repositorio:** https://github.com/creepykai/BaT
