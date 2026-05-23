@@ -33,6 +33,7 @@ $estaSucio = ($clicsActuales >= 50);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bunnies & Tea - Cafetería</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -275,6 +276,72 @@ $estaSucio = ($clicsActuales >= 50);
 
         #btn-limpiar:hover {
             background-color: #0056b3;
+        }
+
+        #clicker-btn, #btn-limpiar {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        @media (max-width: 768px) {
+            .game-canvas {
+                height: auto;
+                min-height: calc(100vh - 80px);
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 20px 0;
+                overflow-y: auto;
+            }
+
+            .stats-personal {
+                position: static;
+                width: 90%;
+                margin: 10px auto;
+                box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+            }
+
+            #clicker-btn {
+                position: static;
+                margin: 30px auto;
+            }
+
+            #aviso-penalizacion {
+                position: static;
+                transform: none;
+                width: 90% !important;
+                font-size: 14px;
+                padding: 10px;
+                margin: 15px auto;
+                animation: palpitarErrorMovil 1.5s infinite;
+            }
+
+            #btn-limpiar {
+                display: block;
+                margin: 10px auto 0 auto;
+                width: 80%;
+            }
+
+            .notification {
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%) translateY(30px);
+            }
+
+            .notification.show {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes palpitarErrorMovil {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
     </style>

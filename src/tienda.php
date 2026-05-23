@@ -54,6 +54,7 @@ $misMonedas = $stmt->fetchColumn();
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bunnies & Tea - Tienda</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -196,6 +197,34 @@ $misMonedas = $stmt->fetchColumn();
         }
         .btn-logout {
             color: #e57373 !important;
+        }
+
+        .tab-btn, .btn-buy {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .card {
+                width: 90%;
+                max-width: 280px;
+            }
+            .coins-info {
+                font-size: 1.2em;
+                padding: 8px 15px;
+            }
+            .tab-btn {
+                padding: 8px 15px;
+                font-size: 1.2em;
+            }
         }
     </style>
 </head>
