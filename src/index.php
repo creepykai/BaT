@@ -21,6 +21,7 @@ $stmtC->execute([$usuarioId]);
 $misConejos = $stmtC->fetchAll();
 
 $produccionPorSegundo = $game->getProduccionTotal($usuarioId);
+$valorClicActual = $game->getClickValue($usuarioId);
 
 $stmtS = $pdo->prepare("SELECT clicsSucios FROM usuario WHERE usuarioId = ?");
 $stmtS->execute([$usuarioId]);
@@ -234,18 +235,51 @@ $estaSucio = ($clicsActuales >= 50);
         }
 
         @keyframes palpitarError {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            50% { transform: translateX(-50%) scale(1.05); opacity: 0.9; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        .cafeteria-sucia {
+            filter: sepia(0.6) brightness(0.9) contrast(1.1);
+            transition: filter 0.5s ease-in-out;
         }
 
         #aviso-penalizacion {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: #ffe6e6;
+            border: 2px solid #cc0000;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
             animation: palpitarError 1.5s infinite;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        #btn-limpiar {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #btn-limpiar:hover {
+            background-color: #0056b3;
         }
 
     </style>
 </head>
-<body>
+<body class="<?php echo $estaSucio ? 'cafeteria-sucia' : ''; ?>">
 
     <nav class="nav-bar" style="justify-content: space-between; padding: 0 20px;">
         <div style="display: flex; align-items: center;">
@@ -255,7 +289,6 @@ $estaSucio = ($clicsActuales >= 50);
                 <span id="monedas-total" class="coin-amount"><?php echo number_format($datosUsuario['monedasActuales'], 2); ?></span>
                 <div class="pps-tag" style="margin-left: 35px; margin-top: -5px;">
                     Producción: +<span id="pps-display"><?php echo number_format($produccionPorSegundo, 2); ?></span>/s
-                    <span id="aviso-penalizacion" style="display: none; color: #e57373; font-size: 0.8em; font-weight: bold; margin-left: 10px; background: #ffebee; padding: 2px 8px; border-radius: 10px;">¡-50% 📉!</span>
                 </div>
             </div>
         </div>
@@ -267,6 +300,10 @@ $estaSucio = ($clicsActuales >= 50);
     </nav>
 
     <main class="game-canvas">
+        <div id="aviso-penalizacion" style="display: <?php echo $estaSucio ? 'block' : 'none'; ?>;">
+            ⚠️ ¡La cafetería está muy sucia! La producción de los conejos se ha reducido a la mitad.
+            <button id="btn-limpiar">Limpiar (20 🪙)</button>
+        </div>
         
         <div class="stats-personal">
             <h3>Tu Equipo</h3>
@@ -286,9 +323,6 @@ $estaSucio = ($clicsActuales >= 50);
             <div style="background: #eee; height: 10px; border-radius: 5px;">
                 <div id="barra-suciedad" style="background: var(--primary); height: 100%; width: <?php echo min(100, ($clicsActuales/50)*100); ?>%; transition: 0.3s; max-width: 100%;"></div>
             </div>
-            <button id="btn-limpiar" class="nav-btn" style="width: 100%; margin-top: 10px; display: <?php echo $estaSucio ? 'block' : 'none'; ?>">
-                Limpiar Cafetería (Gratis)
-            </button>
         </div>
 
         <div id="bunny-container" style="font-size: 100px;">
@@ -318,41 +352,42 @@ $estaSucio = ($clicsActuales >= 50);
         const botonClicker = document.getElementById('clicker-btn');
         const notificacion = document.getElementById('venta-notif');
 
+        let clicsPendientes = 0;
+        let valorClicVisual = parseFloat(<?php echo $valorClicActual; ?>);
+        let monedasVisuales = parseFloat(<?php echo $datosUsuario['monedasActuales']; ?>);
+
         botonClicker.addEventListener('click', () => {
-            actualizarServidor();
+            clicsPendientes++;
+            monedasVisuales += valorClicVisual;
+            displayMonedas.innerText = monedasVisuales.toFixed(2);
+            animarNotificacion(valorClicVisual);
         });
 
         document.getElementById('btn-limpiar').addEventListener('click', () => {
-            fetch('controllers/cleanController.php').then(() => {
-                location.reload(); 
-            });
-        });
-
-        function actualizarServidor() {
-            fetch('controllers/coinController.php', { method: 'POST' })
-            .then(response => response.json())
+            fetch('controllers/cleanController.php', {
+                method: 'POST'
+            })
+            .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    displayMonedas.innerText = parseFloat(data.new_balance).toFixed(2);
-                    animarNotificacion(data.cantidad_ganada);
-
-                    const clics = data.clics_sucios;
+                    monedasVisuales = parseFloat(data.new_balance);
+                    displayMonedas.innerText = monedasVisuales.toFixed(2);
+                    
+                    document.body.classList.remove('cafeteria-sucia');
+                    document.getElementById('aviso-penalizacion').style.display = 'none';
+                    
                     const barra = document.getElementById('barra-suciedad');
-                    const btnLimpiar = document.getElementById('btn-limpiar');
                     const texto = document.getElementById('texto-suciedad');
                     const panel = document.getElementById('status-limpieza');
-
-                    const porcentaje = Math.min((clics / 50) * 100, 100);
-                    barra.style.width = porcentaje + "%";
-
-                    if (clics >= 50) {
-                        btnLimpiar.style.display = 'block';
-                        texto.innerText = "¡MUY SUCIO!";
-                        panel.style.borderColor = '#e57373';
-                    }
+                    barra.style.width = "0%";
+                    texto.innerText = "Limpio";
+                    panel.style.borderColor = '#81c784';
+                } else {
+                    alert("No puedes limpiar: " + data.message);
                 }
-            });
-        }
+            })
+            .catch(error => console.error("Error al intentar limpiar:", error));
+        });
 
         function animarNotificacion(cantidad) {
             notificacion.innerText = "¡Venta! +" + parseFloat(cantidad).toFixed(2);
@@ -360,13 +395,70 @@ $estaSucio = ($clicsActuales >= 50);
             setTimeout(() => { notificacion.classList.remove('show'); }, 1000);
         }
 
+        setInterval(() => {
+            if (clicsPendientes > 0) {
+                let clicsAEnviar = clicsPendientes;
+                clicsPendientes = 0; 
+
+                fetch('controllers/coinController.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clics: clicsAEnviar })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        monedasVisuales = parseFloat(data.new_balance);
+                        displayMonedas.innerText = monedasVisuales.toFixed(2);
+                        
+                        if (data.clics_sucios !== undefined) {
+                            const clics = data.clics_sucios;
+                            const barra = document.getElementById('barra-suciedad');
+                            const texto = document.getElementById('texto-suciedad');
+                            const panel = document.getElementById('status-limpieza');
+
+                            const porcentaje = Math.min((clics / 50) * 100, 100);
+                            barra.style.width = porcentaje + "%";
+
+                            if (clics >= 50) {
+                                texto.innerText = "¡MUY SUCIO!";
+                                panel.style.borderColor = '#e57373';
+                                document.getElementById('aviso-penalizacion').style.display = 'block';
+                                document.body.classList.add('cafeteria-sucia');
+                            } else {
+                                texto.innerText = "Limpio";
+                                panel.style.borderColor = '#81c784';
+                                document.getElementById('aviso-penalizacion').style.display = 'none';
+                                document.body.classList.remove('cafeteria-sucia');
+                            }
+                        }
+
+                        if (data.logros_nuevos && data.logros_nuevos.length > 0) {
+                            data.logros_nuevos.forEach(logro => {
+                                alert("🏆 ¡LOGRO DESBLOQUEADO!\n" + logro.nombre + "\n" + logro.descripcion);
+                            });
+                        }
+                    }
+                })
+                .catch(error => console.error("Error en sincronización:", error));
+            }
+        }, 3000);
 
         setInterval(() => {
             fetch('controllers/passiveProductionController.php')
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    displayMonedas.innerText = parseFloat(data.new_balance).toFixed(2);
+                    if (clicsPendientes === 0) {
+                        monedasVisuales = parseFloat(data.new_balance);
+                        displayMonedas.innerText = monedasVisuales.toFixed(2);
+                    } else {
+                        const diff = parseFloat(data.new_balance) - (monedasVisuales - (clicsPendientes * valorClicVisual));
+                        if (diff > 0) {
+                            monedasVisuales += diff;
+                            displayMonedas.innerText = monedasVisuales.toFixed(2);
+                        }
+                    }
                     
                     if (data.current_pps !== undefined) {
                         document.getElementById('pps-display').innerText = parseFloat(data.current_pps).toFixed(2);
@@ -375,7 +467,6 @@ $estaSucio = ($clicsActuales >= 50);
                     if (data.clics_sucios !== undefined) {
                         const clics = data.clics_sucios;
                         const barra = document.getElementById('barra-suciedad');
-                        const btnLimpiar = document.getElementById('btn-limpiar');
                         const texto = document.getElementById('texto-suciedad');
                         const panel = document.getElementById('status-limpieza');
 
@@ -383,15 +474,15 @@ $estaSucio = ($clicsActuales >= 50);
                         barra.style.width = porcentaje + "%";
 
                         if (clics >= 50) {
-                            btnLimpiar.style.display = 'block';
                             texto.innerText = "¡MUY SUCIO!";
                             panel.style.borderColor = '#e57373';
-                            document.getElementById('aviso-penalizacion').style.display = 'inline-block';
+                            document.getElementById('aviso-penalizacion').style.display = 'block';
+                            document.body.classList.add('cafeteria-sucia');
                         } else {
-                            btnLimpiar.style.display = 'none';
                             texto.innerText = "Limpio";
                             panel.style.borderColor = '#81c784';
                             document.getElementById('aviso-penalizacion').style.display = 'none';
+                            document.body.classList.remove('cafeteria-sucia');
                         }
                     }
                 }

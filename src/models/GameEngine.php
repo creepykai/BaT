@@ -20,11 +20,12 @@ class GameEngine {
         return $valorBase + $extra;
     }
 
-    public function procesarClic($usuarioId) {
+    public function procesarClic($usuarioId, $cantidadClics = 1) {
         $valorClic = $this->getClickValue($usuarioId);
+        $valorTotal = $valorClic * $cantidadClics;
         
-        $stmt = $this->pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales + ?, monedasHistoricas = monedasHistoricas + ?, clicsSucios = clicsSucios + 1 WHERE usuarioId = ?");
-        $stmt->execute([$valorClic, $valorClic, $usuarioId]);
+        $stmt = $this->pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales + ?, monedasHistoricas = monedasHistoricas + ?, clicsSucios = clicsSucios + ? WHERE usuarioId = ?");
+        $stmt->execute([$valorTotal, $valorTotal, $cantidadClics, $usuarioId]);
 
         $stmt = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
         $stmt->execute([$usuarioId]);
@@ -32,7 +33,6 @@ class GameEngine {
     }
 
     public function getProduccionTotal($usuarioId) {
-
         $stmt = $this->pdo->prepare("SELECT clicsSucios FROM usuario WHERE usuarioId = ?");
         $stmt->execute([$usuarioId]);
         $suciedad = $stmt->fetchColumn() ?: 0;
@@ -43,14 +43,12 @@ class GameEngine {
                 WHERE uc.usuarioId = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$usuarioId]);
-        $resultado = $stmt->fetch();
-        $produccionBase = $resultado['total'] ?? 0;
-
+        $total = $stmt->fetchColumn() ?: 0;
 
         if ($suciedad >= 50) {
-            return $produccionBase * 0.20; 
+            $total = $total / 2;
         }
 
-        return $produccionBase;
+        return $total;
     }
 }

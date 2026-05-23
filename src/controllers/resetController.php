@@ -18,7 +18,10 @@ try {
     $stmt2 = $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?");
     $stmt2->execute([$usuarioId]);
 
-    $stmt3 = $pdo->prepare("UPDATE usuario SET monedasActuales = 0, clicsSucios = 0 WHERE usuarioId = ?");
+    $stmtLogros = $pdo->prepare("DELETE FROM usuario_logro WHERE usuarioId = ?");
+    $stmtLogros->execute([$usuarioId]);
+
+    $stmt3 = $pdo->prepare("UPDATE usuario SET monedasActuales = 0, monedasHistoricas = 0, puntosLegado = 0, clicsSucios = 0 WHERE usuarioId = ?");
     $stmt3->execute([$usuarioId]);
 
     $pdo->commit();

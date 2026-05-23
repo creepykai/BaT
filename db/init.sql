@@ -7,7 +7,6 @@ CREATE TABLE usuario (
     monedasActuales DECIMAL(20,2) DEFAULT 0.00,
     clicsSucios DECIMAL(10,2) DEFAULT 0.00,
     ultimoAcceso DATETIME DEFAULT CURRENT_TIMESTAMP,
-    -- Nuevas columnas añadidas
     monedasHistoricas DECIMAL(20,2) DEFAULT 0.00,
     puntosLegado INT DEFAULT 0
 );
