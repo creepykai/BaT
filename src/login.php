@@ -1,26 +1,5 @@
 <?php
-
-require_once 'db.php';
-require_once 'models/AuthManager.php';
-
-$auth = new AuthManager($pdo);
-$error = "";
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $pass = $_POST['password'];
-
-
-    if ($auth->iniciarSesion($email, $pass)) {
-
-        header("Location: index.php");
-        exit();
-    } else {
-
-        $error = "Email o contraseña incorrectos.";
-    }
-}
+$error = isset($_GET['error']) ? $_GET['error'] : "";
 ?>
 
 <!DOCTYPE html>
@@ -36,14 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <h1>Entrar a la Cafetería 🐰☕</h1>
+    <h1>Entrar a la Cafetería</h1>
     
-    <?php if($error) echo "<p style='color:red;'>$error</p>"; ?>
+    <?php if($error) echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>"; ?>
 
-    <form method="POST">
+    <form method="POST" action="controllers/importController.php" enctype="multipart/form-data">
         <input type="email" name="email" placeholder="tu@correo.com" required><br>
         <input type="password" name="password" placeholder="Tu contraseña" required><br>
-        <button type="submit">Entrar</button>
+        <input type="file" name="archivo_partida" id="file-import" accept=".json" style="display:none;" onchange="document.getElementById('file-label').innerText = this.files[0].name">
+        <label id="file-label" for="file-import" class="btn-config" style="cursor:pointer; display:inline-block; margin-top:10px; padding:8px 12px; background-color:#8D6E63; color:white; border-radius:4px; font-family:Arial,sans-serif; font-size:14px;">Cargar partida opcional (.json)</label><br>
+        <button type="submit" style="margin-top:10px;">Entrar</button>
     </form>
     
     <p>¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a></p>

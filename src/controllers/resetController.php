@@ -4,7 +4,7 @@ require_once '../db.php';
 
 if (!isset($_SESSION['usuarioId'])) {
     echo json_encode(['status' => 'error', 'message' => 'No autenticado']);
-    exit;
+    exit();
 }
 
 $usuarioId = $_SESSION['usuarioId'];
@@ -12,23 +12,36 @@ $usuarioId = $_SESSION['usuarioId'];
 try {
     $pdo->beginTransaction();
 
-    $stmt1 = $pdo->prepare("DELETE FROM usuario_conejo WHERE usuarioId = ?");
-    $stmt1->execute([$usuarioId]);
+    $stmt = $pdo->prepare("SELECT monedasHistoricas FROM usuario WHERE usuarioId = ?");
+    $stmt->execute([$usuarioId]);
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $monedasHistoricas = $resultado ? (float)$resultado['monedasHistoricas'] : 0;
+    
+    $nuevasHojas = floor($monedasHistoricas / 10000);
 
-    $stmt2 = $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?");
-    $stmt2->execute([$usuarioId]);
+    $stmtDelC = $pdo->prepare("DELETE FROM usuario_conejo WHERE usuarioId = ?");
+    $stmtDelC->execute([$usuarioId]);
 
-    $stmtLogros = $pdo->prepare("DELETE FROM usuario_logro WHERE usuarioId = ?");
-    $stmtLogros->execute([$usuarioId]);
+    $stmtDelU = $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?");
+    $stmtDelU->execute([$usuarioId]);
 
-    $stmt3 = $pdo->prepare("UPDATE usuario SET monedasActuales = 0, monedasHistoricas = 0, puntosLegado = 0, clicsSucios = 0 WHERE usuarioId = ?");
-    $stmt3->execute([$usuarioId]);
+    $stmtUpdate = $pdo->prepare("UPDATE usuario 
+                                 SET monedasActuales = 0, 
+                                     monedasHistoricas = 0, 
+                                     clicsSucios = 0, 
+                                     puntosLegado = puntosLegado + ? 
+                                 WHERE usuarioId = ?");
+    $stmtUpdate->execute([$nuevasHojas, $usuarioId]);
 
     $pdo->commit();
+
     echo json_encode(['status' => 'success']);
+    exit();
 
 } catch (Exception $e) {
     $pdo->rollBack();
-    echo json_encode(['status' => 'error', 'message' => 'Error al reiniciar la partida']);
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    exit();
 }
 ?>

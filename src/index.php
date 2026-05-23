@@ -6,9 +6,11 @@ require_once 'models/GameEngine.php';
 $game = new GameEngine($pdo);
 $usuarioId = $_SESSION['usuarioId'];
 
-$stmt = $pdo->prepare("SELECT email, monedasActuales, nombreCafeteria FROM usuario WHERE usuarioId = ?");
+$stmt = $pdo->prepare("SELECT email, monedasActuales, nombreCafeteria, puntosLegado FROM usuario WHERE usuarioId = ?");
 $stmt->execute([$usuarioId]);
 $datosUsuario = $stmt->fetch();
+
+$puntosLegado = $datosUsuario['puntosLegado'] ?? 0;
 
 $stmtC = $pdo->prepare("
     SELECT c.nombre, COUNT(uc.usuario_conejoId) as total 

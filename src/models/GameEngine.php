@@ -6,6 +6,14 @@ class GameEngine {
         $this->pdo = $pdo;
     }
 
+    public function getMultiplicadorLegado($usuarioId) {
+        $stmt = $this->pdo->prepare("SELECT puntosLegado FROM usuario WHERE usuarioId = ?");
+        $stmt->execute([$usuarioId]);
+        $puntosLegado = $stmt->fetchColumn() ?: 0;
+        
+        return 1 + ($puntosLegado * 0.05);
+    }
+
     public function getClickValue($usuarioId) {
         $valorBase = 1.00;
 
@@ -17,7 +25,8 @@ class GameEngine {
         $stmt->execute([$usuarioId]);
         $extra = $stmt->fetchColumn() ?: 0;
 
-        return $valorBase + $extra;
+        $multiplicador = $this->getMultiplicadorLegado($usuarioId);
+        return ($valorBase + $extra) * $multiplicador;
     }
 
     public function procesarClic($usuarioId, $cantidadClics = 1) {
@@ -45,6 +54,9 @@ class GameEngine {
         $stmt->execute([$usuarioId]);
         $total = $stmt->fetchColumn() ?: 0;
 
+        $multiplicador = $this->getMultiplicadorLegado($usuarioId);
+        $total = $total * $multiplicador;
+
         if ($suciedad >= 50) {
             $total = $total / 2;
         }
@@ -52,3 +64,4 @@ class GameEngine {
         return $total;
     }
 }
+?>

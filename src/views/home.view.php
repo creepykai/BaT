@@ -20,6 +20,11 @@
                     Producción: +<span id="pps-display"><?php echo number_format($produccionPorSegundo, 2); ?></span>/s
                 </div>
             </div>
+            <?php if ($puntosLegado > 0): ?>
+                <div style="display: inline-block; margin-left: 20px; color: #81C784; font-weight: bold; font-family: Arial, sans-serif; font-size: 14px;">
+                    <?= htmlspecialchars($puntosLegado) ?> Hojas (x<?= number_format(1 + ($puntosLegado * 0.05), 2) ?> Bonus)
+                </div>
+            <?php endif; ?>
         </div>
         <ul class="nav-links" style="list-style: none; display: flex; align-items: center; gap: 20px; margin: 0; padding: 0 15px 0 0;">
             <li><a href="index.php" style="text-decoration: none; color: #4e342e; font-weight: 700;">Cafetería</a></li>
@@ -75,6 +80,7 @@
             </div>
             
             <button id="btn-reiniciar-partida" class="btn-config btn-peligro">Reiniciar Partida</button>
+            <a href="controllers/exportController.php" class="btn-config" style="background-color: #5d4037; color: white;">Descargar Partida (.json)</a>
             <a href="logout.php" class="btn-config btn-salir">Cerrar Sesión</a>
             
             <button id="btn-cerrar-ajustes" class="btn-config btn-volver">Volver al Juego</button>
