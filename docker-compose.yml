@@ -21,6 +21,7 @@ services:
       MYSQL_PASSWORD: user_password
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
     networks:
       - bunnies_network
 
@@ -41,3 +42,6 @@ services:
 networks:
   bunnies_network:
     driver: bridge
+
+volumes:
+  db_data:

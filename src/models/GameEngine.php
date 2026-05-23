@@ -23,9 +23,8 @@ class GameEngine {
     public function procesarClic($usuarioId) {
         $valorClic = $this->getClickValue($usuarioId);
         
-
-        $stmt = $this->pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales + ?, clicsSucios = clicsSucios + 1 WHERE usuarioId = ?");
-        $stmt->execute([$valorClic, $usuarioId]);
+        $stmt = $this->pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales + ?, monedasHistoricas = monedasHistoricas + ?, clicsSucios = clicsSucios + 1 WHERE usuarioId = ?");
+        $stmt->execute([$valorClic, $valorClic, $usuarioId]);
 
         $stmt = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
         $stmt->execute([$usuarioId]);

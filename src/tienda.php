@@ -1,10 +1,5 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['usuarioId'])) { 
-    header("Location: login.php"); 
-    exit(); 
-}
+require_once 'verificar_sesion.php';
 
 require_once 'db.php';
 require_once 'models/ShopManager.php';
@@ -15,9 +10,18 @@ $mensaje = "";
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once 'models/AchievementManager.php';
+    $achievements = new AchievementManager($pdo);
+    
     if (isset($_POST['conejoId'])) {
         if ($shop->comprarConejo($usuarioId, $_POST['conejoId'])) {
             $mensaje = "<div class='alert success'>¡Nuevo conejo contratado! 🐰</div>";
+            $nuevosLogros = $achievements->chequearLogros($usuarioId);
+            if (!empty($nuevosLogros)) {
+                foreach ($nuevosLogros as $l) {
+                    $mensaje .= "<div class='alert success'>🏆 ¡Logro desbloqueado!: <strong>" . htmlspecialchars($l['nombre']) . "</strong> - " . htmlspecialchars($l['descripcion']) . "</div>";
+                }
+            }
         } else { 
             $mensaje = "<div class='alert error'>No se pudo contratar al conejo.</div>"; 
         }
@@ -26,6 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['utensilioId'])) {
         if ($shop->comprarUtensilio($usuarioId, $_POST['utensilioId'])) {
             $mensaje = "<div class='alert success'>¡Utensilio mejorado! ☕</div>";
+            $nuevosLogros = $achievements->chequearLogros($usuarioId);
+            if (!empty($nuevosLogros)) {
+                foreach ($nuevosLogros as $l) {
+                    $mensaje .= "<div class='alert success'>🏆 ¡Logro desbloqueado!: <strong>" . htmlspecialchars($l['nombre']) . "</strong> - " . htmlspecialchars($l['descripcion']) . "</div>";
+                }
+            }
         } else { 
             $mensaje = "<div class='alert error'>No se pudo comprar el utensilio.</div>"; 
         }

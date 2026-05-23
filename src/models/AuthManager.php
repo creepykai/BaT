@@ -27,6 +27,9 @@ class AuthManager {
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
             }
+            
+            session_regenerate_id(true);
+            
             $_SESSION['usuarioId'] = $user['usuarioId'];
             return true;
         }

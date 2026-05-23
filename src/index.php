@@ -1,6 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuarioId'])) { header("Location: login.php"); exit(); }
+require_once 'verificar_sesion.php';
 require_once 'db.php';
 require_once 'models/GameEngine.php';
 
