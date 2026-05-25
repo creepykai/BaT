@@ -1,4 +1,8 @@
 <?php
+/**
+ * Se llama por AJAX cuando se pulsa el botón de limpiar en la cafetería.
+ * Comprueba si el jugador tiene monedas suficientes para limpiar y resetea la suciedad.
+ */
 session_start();
 require_once '../db.php';
 

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Se encarga de la seguridad de las cuentas de usuario.
+ * Gestiona el registro y verifica las contraseñas al hacer login usando hashing seguro.
+ */
 
 class AuthManager {
     private $pdo;

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Comprueba si el usuario está logueado.
+ * Se incluye al principio de los archivos protegidos para redirigir al login si no hay sesión.
+ */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

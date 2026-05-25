@@ -1,4 +1,8 @@
 <?php
+/**
+ * Obtiene las estadísticas de progreso y logros desbloqueados del usuario.
+ * Estos datos se usan para mostrarlos en el menú de ajustes o estadísticas.
+ */
 session_start();
 require_once '../db.php';
 

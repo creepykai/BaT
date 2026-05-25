@@ -1,94 +1,81 @@
 <?php
+/**
+ * Recibe un archivo JSON y restaura la partida guardada del usuario.
+ * Usa transacciones de PDO para evitar corromper la base de datos si el archivo es inválido.
+ */
 session_start();
 require_once '../db.php';
 require_once '../models/AuthManager.php';
 
-$email = isset($_POST['email']) ? trim($_POST['email']) : '';
-$password = isset($_POST['password']) ? $_POST['password'] : '';
-
-$auth = new AuthManager($pdo);
-if (!$auth->iniciarSesion($email, $password)) {
-    header("Location: ../login.php?error=" . urlencode("Email o contraseña incorrectos."));
-    exit();
-}
-
-$usuarioId = $_SESSION['usuarioId'];
-$fileUploaded = isset($_FILES['archivo_partida']) && $_FILES['archivo_partida']['error'] === UPLOAD_ERR_OK;
-
-if (!$fileUploaded) {
-    header("Location: ../index.php");
-    exit();
-}
-
-$pdo->beginTransaction();
-
-try {
-    $jsonContent = file_get_contents($_FILES['archivo_partida']['tmp_name']);
-    $data = json_decode($jsonContent, true);
-
-    if ($data === null) {
-        throw new Exception("Archivo JSON inválido.");
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['partida_json'])) {
+    
+    $email = $_POST['email'] ?? '';
+    $pass = $_POST['password'] ?? '';
+    
+    $auth = new AuthManager($pdo);
+    if (!$auth->iniciarSesion($email, $pass)) {
+        die("Error: Credenciales incorrectas.");
     }
+    
+    $usuarioId = $_SESSION['usuarioId'];
 
-    $stmtDelC = $pdo->prepare("DELETE FROM usuario_conejo WHERE usuarioId = ?");
-    $stmtDelC->execute([$usuarioId]);
-
-    $stmtDelU = $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?");
-    $stmtDelU->execute([$usuarioId]);
-
-    $jugador = isset($data['jugador']) ? $data['jugador'] : [];
-    $monedasActuales = isset($jugador['monedasActuales']) ? (float)$jugador['monedasActuales'] : 0.00;
-    $monedasHistoricas = isset($jugador['monedasHistoricas']) ? (float)$jugador['monedasHistoricas'] : 0.00;
-    $puntosLegado = isset($jugador['puntosLegado']) ? (int)$jugador['puntosLegado'] : 0;
-    $nombreCafeteria = isset($jugador['nombreCafeteria']) ? $jugador['nombreCafeteria'] : '';
-
-    $stmtUpdateUser = $pdo->prepare("UPDATE usuario SET monedasActuales = ?, monedasHistoricas = ?, puntosLegado = ?, nombreCafeteria = ?, clicsSucios = 0 WHERE usuarioId = ?");
-    $stmtUpdateUser->execute([$monedasActuales, $monedasHistoricas, $puntosLegado, $nombreCafeteria, $usuarioId]);
-
-    $conejos = isset($data['inventario_conejos']) ? $data['inventario_conejos'] : [];
-    $stmtConejoId = $pdo->prepare("SELECT conejoId FROM conejo WHERE nombre = ?");
-    $stmtInsertC = $pdo->prepare("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (?, ?)");
-
-    foreach ($conejos as $c) {
-        $nombreConejo = isset($c['nombre']) ? $c['nombre'] : '';
-        $cantidad = isset($c['cantidad']) ? (int)$c['cantidad'] : 0;
-
-        if ($nombreConejo !== '' && $cantidad > 0) {
-            $stmtConejoId->execute([$nombreConejo]);
-            $conejoId = $stmtConejoId->fetchColumn();
-
-            if ($conejoId) {
-                for ($i = 0; $i < $cantidad; $i++) {
-                    $stmtInsertC->execute([$usuarioId, $conejoId]);
+    $jsonContent = file_get_contents($_FILES['partida_json']['tmp_name']);
+    $data = json_decode($jsonContent, true);
+    
+    if (!$data || !isset($data['jugador'])) {
+        die("Error: Archivo de guardado inválido.");
+    }
+    
+    try {
+        $pdo->beginTransaction();
+        
+        $jugador = $data['jugador'];
+        $stmtUpdateUser = $pdo->prepare("UPDATE usuario SET monedasActuales = ?, monedasHistoricas = ?, puntosLegado = ?, nombreCafeteria = ? WHERE usuarioId = ?");
+        $stmtUpdateUser->execute([
+            $jugador['monedasActuales'] ?? 0,
+            $jugador['monedasHistoricas'] ?? 0,
+            $jugador['puntosLegado'] ?? 0,
+            $jugador['nombreCafeteria'] ?? 'Cafetería',
+            $usuarioId
+        ]);
+        
+        $pdo->prepare("DELETE FROM usuario_conejo WHERE usuarioId = ?")->execute([$usuarioId]);
+        $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?")->execute([$usuarioId]);
+        
+        if (!empty($data['inventario_conejos'])) {
+            $stmtConejoId = $pdo->prepare("SELECT conejoId FROM conejo WHERE nombre = ?");
+            $stmtInsertConejo = $pdo->prepare("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (?, ?)");
+            
+            foreach ($data['inventario_conejos'] as $conejoGuardado) {
+                $stmtConejoId->execute([$conejoGuardado['nombre']]);
+                $conejoId = $stmtConejoId->fetchColumn();
+                if ($conejoId) {
+                    for ($i = 0; $i < $conejoGuardado['cantidad']; $i++) {
+                        $stmtInsertConejo->execute([$usuarioId, $conejoId]);
+                    }
                 }
             }
         }
-    }
-
-    $utensilios = isset($data['inventario_utensilios']) ? $data['inventario_utensilios'] : [];
-    $stmtUtensilioId = $pdo->prepare("SELECT utensilioId FROM utensilio WHERE nombre = ?");
-    $stmtInsertU = $pdo->prepare("INSERT INTO usuario_utensilio (usuarioId, utensilioId) VALUES (?, ?)");
-
-    foreach ($utensilios as $u) {
-        $nombreUtensilio = isset($u['nombre']) ? $u['nombre'] : '';
-
-        if ($nombreUtensilio !== '') {
-            $stmtUtensilioId->execute([$nombreUtensilio]);
-            $utensilioId = $stmtUtensilioId->fetchColumn();
-
-            if ($utensilioId) {
-                $stmtInsertU->execute([$usuarioId, $utensilioId]);
+        
+        if (!empty($data['inventario_utensilios'])) {
+            $stmtUtensilioId = $pdo->prepare("SELECT utensilioId FROM utensilio WHERE nombre = ?");
+            $stmtInsertUtensilio = $pdo->prepare("INSERT INTO usuario_utensilio (usuarioId, utensilioId) VALUES (?, ?)");
+            
+            foreach ($data['inventario_utensilios'] as $utensilioGuardado) {
+                $stmtUtensilioId->execute([$utensilioGuardado['nombre']]);
+                $utensilioId = $stmtUtensilioId->fetchColumn();
+                if ($utensilioId) {
+                    $stmtInsertUtensilio->execute([$usuarioId, $utensilioId]);
+                }
             }
         }
+        
+        $pdo->commit();
+        header("Location: ../index.php");
+        exit();
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        die("Error al importar la partida: " . $e->getMessage());
     }
-
-    $pdo->commit();
-    header("Location: ../index.php");
-    exit();
-
-} catch (Exception $e) {
-    $pdo->rollBack();
-    header("Location: ../login.php?error=" . urlencode("Error al importar la partida: " . $e->getMessage()));
-    exit();
 }
 ?>

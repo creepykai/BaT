@@ -1,4 +1,8 @@
 <?php
+/**
+ * Modelo que gestiona la lógica de la tienda.
+ * Calcula los precios de los conejos, que van subiendo con cada compra, y actualiza el inventario.
+ */
 class ShopManager {
     private $pdo;
 
@@ -7,7 +11,6 @@ class ShopManager {
     }
 
     public function getCatalogo($usuarioId) {
-
         $sql = "SELECT c.*, 
                 (SELECT COUNT(*) FROM usuario_conejo uc WHERE uc.conejoId = c.conejoId AND uc.usuarioId = ?) as cantidadPoseida
                 FROM conejo c 
@@ -17,16 +20,15 @@ class ShopManager {
         $rows = $stmt->fetchAll();
 
         foreach ($rows as &$row) {
-            $multiplicador = pow(1.15, $row['cantidadPoseida']);
-            $row['costeBase'] = round($row['costeBase'] * $multiplicador, 2);
+            $row['costeBase'] = ceil(($row['costeBase'] * pow(1.15, $row['cantidadPoseida'])) / 5) * 5;
         }
 
         return $rows;
     }
+
     public function comprarConejo($usuarioId, $conejoId) {
         try {
             $this->pdo->beginTransaction();
-
 
             $stmtC = $this->pdo->prepare("SELECT costeBase FROM conejo WHERE conejoId = ?");
             $stmtC->execute([$conejoId]);
@@ -36,13 +38,11 @@ class ShopManager {
             $stmtCheck->execute([$usuarioId, $conejoId]);
             $cantidadActual = $stmtCheck->fetchColumn();
 
-            $multiplicador = pow(1.15, $cantidadActual);
-            $costeActual = round($conejo['costeBase'] * $multiplicador, 2);
+            $costeActual = ceil(($conejo['costeBase'] * pow(1.15, $cantidadActual)) / 5) * 5;
 
             $stmtU = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
             $stmtU->execute([$usuarioId]);
             $usuario = $stmtU->fetch();
-
 
             if (!$conejo || $usuario['monedasActuales'] < $costeActual) {
                 $this->pdo->rollBack();
@@ -109,3 +109,4 @@ class ShopManager {
         }
     }
 }
+?>

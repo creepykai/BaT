@@ -1,4 +1,8 @@
 <?php
+/**
+ * Gestiona el sistema de prestigio.
+ * Reinicia la partida del jugador a cero, dándole a cambio "puntos de legado".
+ */
 session_start();
 require_once '../db.php';
 

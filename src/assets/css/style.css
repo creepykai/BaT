@@ -1,3 +1,7 @@
+/**
+ * Archivo principal de estilos (CSS).
+ * Aquí se definen los colores, la estructura visual, el diseño responsive para móviles y las animaciones de la UI.
+ */
 :root {
     --primary: #8d6e63;
     --accent: #ffccbc;

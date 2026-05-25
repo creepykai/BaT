@@ -1,4 +1,8 @@
 <?php
+/**
+ * Clase encargada de gestionar los logros del jugador.
+ * Comprueba las estadísticas y desbloquea los logros que se hayan cumplido.
+ */
 class AchievementManager {
     private $pdo;
 

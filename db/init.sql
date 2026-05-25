@@ -36,7 +36,8 @@ CREATE TABLE utensilio (
     nombre VARCHAR(100) NOT NULL,
     valorExtraClic DECIMAL(10,2) NOT NULL,
     costeBase DECIMAL(15,2) NOT NULL,
-    limiteMax INT DEFAULT 1
+    limiteMax INT DEFAULT 1,
+    produccionPasivaExtra DECIMAL(10,2) DEFAULT 0.00
 );
 
 -- Relación Usuario-Utensilio (Inventario de mejoras)
@@ -78,14 +79,16 @@ CREATE TABLE usuario_logro (
 
 -- Tienda de Conejos
 INSERT INTO conejo (nombre, rol, produccionBase, costeBase) VALUES 
-('Conejo Novato', 'Camarero', 1.00, 15.00),
-('Conejo Chef', 'Cocinero', 5.00, 100.00),
-('Conejo Mayordomo', 'Servicio VIP', 20.00, 500.00);
+('Conejo Novato', 'Camarero', 1.00, 20.00),
+('Conejo Chef', 'Cocinero', 5.00, 150.00),
+('Conejo Mayordomo', 'Servicio VIP', 20.00, 850.00);
 
 -- Tienda de Utensilios
-INSERT INTO utensilio (nombre, valorExtraClic, costeBase, limiteMax) VALUES 
-('Cuchara de Madera', 1.00, 50.00, 1),
-('Tetera de Porcelana', 5.00, 250.00, 1);
+INSERT INTO utensilio (nombre, valorExtraClic, costeBase, limiteMax, produccionPasivaExtra) VALUES 
+('Cuchara de Madera', 1.00, 50.00, 1, 0.00),
+('Tetera de Porcelana', 5.00, 250.00, 1, 0.00),
+('Cafetera Profesional', 0.00, 5000.00, 1, 15.00),
+('Horno Industrial', 0.00, 25000.00, 1, 100.00);
 
 -- Logros
 INSERT INTO logro (nombre, descripcion, tipoCondicion, valorCondicion, multiplicadorRecompensa) VALUES 

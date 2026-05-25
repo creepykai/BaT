@@ -1,4 +1,9 @@
 <?php
+/**
+ * Conexión a la base de datos usando PDO.
+ * Utilizamos PDO para poder hacer consultas preparadas y evitar inyección SQL.
+ * Al usar require_once en otros archivos, reutilizamos la conexión.
+ */
 $host = 'db';
 $db   = 'bunniesAndTea';
 $user = 'user_bunnies';

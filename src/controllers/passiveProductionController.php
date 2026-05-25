@@ -1,4 +1,8 @@
 <?php
+/**
+ * Calcula y añade las monedas que generan los conejos automáticamente.
+ * El frontend hace una petición a este archivo cada segundo.
+ */
 session_start();
 require_once '../db.php';
 require_once '../models/GameEngine.php';
@@ -34,6 +38,7 @@ $suciedadActual = $stmtS->fetchColumn();
 
 echo json_encode([
     "status" => "success",
+    "produccion_pasiva" => $produccion,
     "new_balance" => $nuevoSaldo,
     "current_pps" => $ppsActual,
     "clics_sucios" => $suciedadActual,

@@ -1,4 +1,8 @@
 <?php
+/**
+ * Genera un archivo JSON descargable con todo el progreso del jugador.
+ * Útil para hacer copias de seguridad de la partida en local.
+ */
 session_start();
 require_once '../db.php';
 
@@ -36,7 +40,8 @@ try {
     ];
 
     header('Content-Type: application/json');
-    header('Content-Disposition: attachment; filename="bunnies_tea_save_' . date('Ymd') . '.json"');
+    $fecha = date('Y-m-d');
+    header('Content-Disposition: attachment; filename="Bunnies_And_Tea_Guardado_' . $fecha . '.json"');
     
     echo json_encode($datosPartida, JSON_PRETTY_PRINT);
 

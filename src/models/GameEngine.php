@@ -1,4 +1,8 @@
 <?php
+/**
+ * Contiene la lógica matemática del juego.
+ * Aquí se calcula cuánto vale cada clic o cuántas monedas se generan por segundo.
+ */
 class GameEngine {
     private $pdo;
 
@@ -15,30 +19,38 @@ class GameEngine {
     }
 
     public function getClickValue($usuarioId) {
-        $valorBase = 1.00;
-
-        $sql = "SELECT SUM(u.valorExtraClic) as extra 
+        $sql = "SELECT SUM(u.valorExtraClic) as total 
                 FROM usuario_utensilio uu
                 JOIN utensilio u ON uu.utensilioId = u.utensilioId
                 WHERE uu.usuarioId = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$usuarioId]);
-        $extra = $stmt->fetchColumn() ?: 0;
+        $valorUtensilios = $stmt->fetchColumn() ?: 0;
 
-        $multiplicador = $this->getMultiplicadorLegado($usuarioId);
-        return ($valorBase + $extra) * $multiplicador;
+        $produccionPasiva = $this->getProduccionTotal($usuarioId);
+
+        $valorClic = 1 + $valorUtensilios + ($produccionPasiva * 0.05);
+
+        return $valorClic;
     }
 
     public function procesarClic($usuarioId, $cantidadClics = 1) {
         $valorClic = $this->getClickValue($usuarioId);
-        $valorTotal = $valorClic * $cantidadClics;
-        
-        $stmt = $this->pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales + ?, monedasHistoricas = monedasHistoricas + ?, clicsSucios = clicsSucios + ? WHERE usuarioId = ?");
-        $stmt->execute([$valorTotal, $valorTotal, $cantidadClics, $usuarioId]);
+        $gananciaTotal = $valorClic * $cantidadClics;
 
-        $stmt = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
-        $stmt->execute([$usuarioId]);
-        return $stmt->fetchColumn();
+        $stmt = $this->pdo->prepare("
+            UPDATE usuario 
+            SET monedasActuales = monedasActuales + ?, 
+                monedasHistoricas = monedasHistoricas + ?,
+                clicsSucios = clicsSucios + ?
+            WHERE usuarioId = ?
+        ");
+        $stmt->execute([$gananciaTotal, $gananciaTotal, $cantidadClics, $usuarioId]);
+
+        $stmtSaldo = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
+        $stmtSaldo->execute([$usuarioId]);
+        
+        return $stmtSaldo->fetchColumn();
     }
 
     public function getProduccionTotal($usuarioId) {
@@ -52,7 +64,17 @@ class GameEngine {
                 WHERE uc.usuarioId = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$usuarioId]);
-        $total = $stmt->fetchColumn() ?: 0;
+        $totalConejos = $stmt->fetchColumn() ?: 0;
+
+        $sqlU = "SELECT SUM(u.produccionPasivaExtra) as total 
+                 FROM usuario_utensilio uu
+                 JOIN utensilio u ON uu.utensilioId = u.utensilioId
+                 WHERE uu.usuarioId = ?";
+        $stmtU = $this->pdo->prepare($sqlU);
+        $stmtU->execute([$usuarioId]);
+        $totalUtensilios = $stmtU->fetchColumn() ?: 0;
+
+        $total = $totalConejos + $totalUtensilios;
 
         $multiplicador = $this->getMultiplicadorLegado($usuarioId);
         $total = $total * $multiplicador;

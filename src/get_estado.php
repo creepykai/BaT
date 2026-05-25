@@ -1,4 +1,8 @@
 <?php
+/**
+ * Devuelve el estado actual del juego (monedas, producción, etc.) en JSON.
+ * Se llama mediante AJAX/Fetch desde JavaScript para no tener que recargar la página.
+ */
 require_once 'verificar_sesion.php';
 require_once 'db.php';
 require_once 'models/GameEngine.php';

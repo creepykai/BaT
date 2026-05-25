@@ -1,4 +1,8 @@
 <?php
+/**
+ * Procesa los clics manuales enviados desde el frontend (JS).
+ * Actualiza la cantidad de monedas, incrementa la suciedad y comprueba los logros.
+ */
 session_start();
 require_once '../db.php';
 require_once '../models/GameEngine.php';

@@ -1,32 +1,30 @@
 <?php
-$error = isset($_GET['error']) ? $_GET['error'] : "";
-?>
+/**
+ * Archivo que procesa el inicio de sesión.
+ * Recibe los datos por POST y delega la comprobación al AuthManager.
+ * Si todo va bien, redirige al juego. Si no, muestra error en la vista.
+ */
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Entrar - Bunnies & Tea</title>
-    <style>
-        body { font-family: sans-serif; background: #fdf6f0; text-align: center; padding-top: 50px; }
-        form { background: white; padding: 20px; display: inline-block; border-radius: 10px; border: 1px solid #ddd; }
-        input { margin-bottom: 10px; padding: 8px; width: 200px; }
-        button { background: #d4a373; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1>Entrar a la Cafetería</h1>
-    
-    <?php if($error) echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>"; ?>
+require_once 'db.php';
+require_once 'models/AuthManager.php';
 
-    <form method="POST" action="controllers/importController.php" enctype="multipart/form-data">
-        <input type="email" name="email" placeholder="tu@correo.com" required><br>
-        <input type="password" name="password" placeholder="Tu contraseña" required><br>
-        <input type="file" name="archivo_partida" id="file-import" accept=".json" style="display:none;" onchange="document.getElementById('file-label').innerText = this.files[0].name">
-        <label id="file-label" for="file-import" class="btn-config" style="cursor:pointer; display:inline-block; margin-top:10px; padding:8px 12px; background-color:#8D6E63; color:white; border-radius:4px; font-family:Arial,sans-serif; font-size:14px;">Cargar partida opcional (.json)</label><br>
-        <button type="submit" style="margin-top:10px;">Entrar</button>
-    </form>
-    
-    <p>¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a></p>
-</body>
-</html>
+$auth = new AuthManager($pdo);
+$error = "";
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $pass = $_POST['password'];
+
+
+    if ($auth->iniciarSesion($email, $pass)) {
+
+        header("Location: index.php");
+        exit();
+    } else {
+
+        $error = "Email o contraseña incorrectos.";
+    }
+}
+
+require_once 'views/login.view.php';
