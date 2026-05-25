@@ -1,0 +1,12 @@
+{
+    "name": "idige/bat",
+    "description": "Bunnies and Tea Incremental Game",
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
+}
