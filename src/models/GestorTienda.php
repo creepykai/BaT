@@ -3,14 +3,14 @@
  * Modelo que gestiona la lógica de la tienda.
  * Calcula los precios de los conejos, que van subiendo con cada compra, y actualiza el inventario.
  */
-class ShopManager {
+class GestorTienda {
     private $pdo;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
     }
 
-    public function getCatalogo($usuarioId) {
+    public function obtenerCatalogo($usuarioId) {
         $sql = "SELECT c.*, 
                 (SELECT COUNT(*) FROM usuario_conejo uc WHERE uc.conejoId = c.conejoId AND uc.usuarioId = ?) as cantidadPoseida
                 FROM conejo c 
@@ -64,7 +64,7 @@ class ShopManager {
         }
     }
 
-    public function getUtensiliosCatalogo($usuarioId) {
+    public function obtenerCatalogoUtensilios($usuarioId) {
         $sql = "SELECT u.*, 
                 (SELECT COUNT(*) FROM usuario_utensilio uu WHERE uu.utensilioId = u.utensilioId AND uu.usuarioId = ?) as cantidadPoseida
                 FROM utensilio u 

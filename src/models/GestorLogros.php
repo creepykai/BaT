@@ -3,7 +3,7 @@
  * Clase encargada de gestionar los logros del jugador.
  * Comprueba las estadísticas y desbloquea los logros que se hayan cumplido.
  */
-class AchievementManager {
+class GestorLogros {
     private $pdo;
 
     public function __construct($pdo) {

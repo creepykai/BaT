@@ -42,7 +42,6 @@ try {
     header('Content-Type: application/json');
     $fecha = date('Y-m-d');
     header('Content-Disposition: attachment; filename="Bunnies_And_Tea_Guardado_' . $fecha . '.json"');
-    
     echo json_encode($datosPartida, JSON_PRETTY_PRINT);
 
 } catch (Exception $e) {

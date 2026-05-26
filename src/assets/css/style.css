@@ -30,7 +30,7 @@ body {
     overflow: hidden; 
 }
 
-.nav-bar { 
+.barra-navegacion { 
     position: fixed; 
     top: 0; 
     width: 100%; 
@@ -44,7 +44,7 @@ body {
     border-radius: 0 0 20px 20px;
 }
 
-.coins-display { 
+.panel-monedas { 
     padding-left: 30px; 
 }
 
@@ -79,7 +79,7 @@ body {
     font-weight: bold; 
 }
 
-.pps-tag { 
+.etiqueta-pps { 
     font-size: 0.9em; 
     color: var(--success); 
     font-weight: 600; 

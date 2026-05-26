@@ -5,14 +5,17 @@
  */
 session_start();
 require_once '../db.php';
-require_once '../models/AuthManager.php';
+require_once '../models/GestorAutenticacion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['partida_json'])) {
     
-    $email = $_POST['email'] ?? '';
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die("Error: El formato del correo electrónico no es válido.");
+    }
     $pass = $_POST['password'] ?? '';
     
-    $auth = new AuthManager($pdo);
+    $auth = new GestorAutenticacion($pdo);
     if (!$auth->iniciarSesion($email, $pass)) {
         die("Error: Credenciales incorrectas.");
     }
@@ -75,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['partida_json'])) {
         exit();
     } catch (Exception $e) {
         $pdo->rollBack();
-        die("Error al importar la partida: " . $e->getMessage());
+        error_log("Error de importación JSON: " . $e->getMessage());
+        die("Error: El archivo de guardado está corrupto o es inválido.");
     }
 }
 ?>

@@ -1,9 +1,3 @@
-<?php
-/**
- * Vista principal de la cafetería.
- * Aquí está todo el HTML del juego principal, los botones y el JavaScript para mandar los clics al servidor.
- */
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bunnies & Tea - Cafetería</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="<?php echo $estaSucio ? 'cafeteria-sucia' : ''; ?>">
 
-    <nav class="nav-bar" style="justify-content: space-between; padding: 0 20px;">
+    <nav class="barra-navegacion" style="justify-content: space-between; padding: 0 20px;">
         <div style="display: flex; align-items: center;">
             <span class="nav-logo" style="margin-right: 20px;">BaT</span>
-            <div class="coins-display" style="padding-left: 0;">
+            <div class="panel-monedas" style="padding-left: 0;">
                 <span class="coin-ui"></span>
                 <span id="monedas-total" class="coin-amount"><?php echo number_format($datosUsuario['monedasActuales'], 2); ?></span>
-                <div class="pps-tag" style="margin-left: 35px; margin-top: -5px;">
+                <div class="etiqueta-pps" style="margin-left: 35px; margin-top: -5px;">
                     Producción: +<span id="pps-display"><?php echo number_format($produccionPorSegundo, 2); ?></span>/s
                 </div>
             </div>
@@ -64,7 +58,7 @@
             </div>
         </div>
 
-        <div id="bunny-container" style="font-size: 100px;">
+        <div id="contenedor-conejos" style="font-size: 100px;">
         </div> 
         
         <div id="venta-notif" class="notification">¡Venta!</div>
@@ -134,8 +128,8 @@
 
             <div id="tab-opciones" class="seccion-ajustes" style="display: none; text-align: center; padding-top: 20px;">
                 <button id="btn-reiniciar-partida" class="btn-config btn-peligro">Reiniciar Partida</button>
-                <a href="controllers/exportController.php" class="btn-config" style="background-color: #5d4037; color: white;">Descargar Partida (.json)</a>
-                <a href="logout.php" class="btn-config btn-salir">Cerrar Sesión</a>
+                <a href="controllers/controladorExportacion.php" class="btn-config" style="background-color: #5d4037; color: white;">Descargar Partida (.json)</a>
+                <a href="cerrar_sesion.php" class="btn-config btn-salir">Cerrar Sesión</a>
             </div>
 
             <hr style="border-top: 1px solid #d7ccc8; margin-top: 25px; margin-bottom: 15px;">
@@ -161,7 +155,7 @@
         });
 
         document.getElementById('btn-limpiar').addEventListener('click', () => {
-            fetch('controllers/cleanController.php', {
+            fetch('controllers/controladorLimpieza.php', {
                 method: 'POST'
             })
             .then(res => res.json())
@@ -198,7 +192,7 @@
                 clicsPendientes = 0; 
                 peticionesEnVuelo++;
 
-                fetch('controllers/coinController.php', {
+                fetch('controllers/controladorMonedas.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ clics: clicsAEnviar })
@@ -247,7 +241,7 @@
 
         setInterval(() => {
             peticionesEnVuelo++;
-            fetch('controllers/passiveProductionController.php')
+            fetch('controllers/controladorProduccionPasiva.php')
             .then(response => response.json())
             .then(data => {
                 peticionesEnVuelo--;
@@ -308,7 +302,7 @@
             const confirmar = confirm("¿Estás seguro de que quieres empezar de cero? Perderás todos tus empleados y monedas.");
             
             if (confirmar) {
-                fetch('controllers/resetController.php', { method: 'POST' })
+                fetch('controllers/controladorReinicio.php', { method: 'POST' })
                     .then(respuesta => respuesta.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -381,7 +375,7 @@
         let graficoProduccionObj = null;
 
         function renderizarGrafico() {
-            fetch('controllers/statsController.php')
+            fetch('controllers/controladorEstadisticas.php')
                 .then(res => res.json())
                 .then(response => {
                     if (response.status !== 'success') return;

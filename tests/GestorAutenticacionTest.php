@@ -1,20 +1,20 @@
 <?php
 require_once __DIR__ . '/BaseTestCase.php';
-require_once __DIR__ . '/../src/models/AuthManager.php';
+require_once __DIR__ . '/../src/models/GestorAutenticacion.php';
 
-class AuthManagerTest extends BaseTestCase {
-    private $authManager;
+class GestorAutenticacionTest extends BaseTestCase {
+    private $GestorAutenticacion;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->authManager = new AuthManager($this->pdo);
+        $this->GestorAutenticacion = new GestorAutenticacion($this->pdo);
     }
 
     public function test_registrarUsuario_crea_cuenta_con_hash() {
         $email = "nuevo@test.com";
         $password = "123456";
         
-        $result = $this->authManager->registrarUsuario($email, $password);
+        $result = $this->GestorAutenticacion->registrarUsuario($email, $password);
         $this->assertTrue($result);
         
         $stmt = $this->pdo->prepare("SELECT passwordHash FROM usuario WHERE email = ?");
@@ -26,22 +26,22 @@ class AuthManagerTest extends BaseTestCase {
     }
 
     public function test_registrarUsuario_email_duplicado_falla() {
-        $result = $this->authManager->registrarUsuario('test@test.com', 'password');
+        $result = $this->GestorAutenticacion->registrarUsuario('test@test.com', 'password');
         
         $this->assertFalse($result);
     }
 
     public function test_iniciarSesion_credenciales_incorrectas_falla() {
-        $result = $this->authManager->iniciarSesion('test@test.com', 'contraseñamala');
+        $result = $this->GestorAutenticacion->iniciarSesion('test@test.com', 'contraseñamala');
         $this->assertFalse($result);
         
         $this->assertArrayNotHasKey('usuarioId', $_SESSION);
     }
 
     public function test_iniciarSesion_credenciales_correctas_crea_sesion() {
-        $this->authManager->registrarUsuario('login@test.com', 'secreta123');
+        $this->GestorAutenticacion->registrarUsuario('login@test.com', 'secreta123');
         
-        $result = $this->authManager->iniciarSesion('login@test.com', 'secreta123');
+        $result = $this->GestorAutenticacion->iniciarSesion('login@test.com', 'secreta123');
         
         $this->assertTrue($result);
         $this->assertArrayHasKey('usuarioId', $_SESSION);

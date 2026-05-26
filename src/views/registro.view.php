@@ -27,7 +27,7 @@
     </form>
     
     <div style="text-align: center; margin-top: 20px;">
-        <p>¿Ya tienes una cuenta? <a href="login.php" style="color: #8d6e63; font-weight: bold; text-decoration: none;">Inicia sesión aquí ☕</a></p>
+        <p>¿Ya tienes una cuenta? <a href="iniciar_sesion.php" style="color: #8d6e63; font-weight: bold; text-decoration: none;">Inicia sesión aquí ☕</a></p>
     </div>
 </body>
 </html>

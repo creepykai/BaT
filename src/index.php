@@ -1,50 +1,30 @@
 <?php
-/**
- * Controlador principal de la cafetería.
- * Comprueba que la sesión es válida, recoge los datos del jugador desde la base de datos
- * y por último carga la vista (home.view.php).
- */
 require_once 'verificar_sesion.php';
 require_once 'db.php';
-require_once 'models/GameEngine.php';
+require_once 'models/MotorJuego.php';
 
-$game = new GameEngine($pdo);
+$game = new MotorJuego($pdo);
 $usuarioId = $_SESSION['usuarioId'];
 
-$stmt = $pdo->prepare("SELECT email, monedasActuales, nombreCafeteria, puntosLegado, monedasHistoricas FROM usuario WHERE usuarioId = ?");
-$stmt->execute([$usuarioId]);
-$datosUsuario = $stmt->fetch();
+// 1. Obtener datos generales del usuario
+$datosUsuario = $game->obtenerDatosUsuario($usuarioId);
 
 $puntosLegado = $datosUsuario['puntosLegado'] ?? 0;
 $monedasHistoricas = $datosUsuario['monedasHistoricas'] ?? 0;
 $hojasPendientes = floor($monedasHistoricas / 10000);
 $monedasParaSiguiente = 10000 - ($monedasHistoricas % 10000);
 
-$stmtC = $pdo->prepare("
-    SELECT c.nombre, COUNT(uc.usuario_conejoId) as total 
-    FROM conejo c
-    INNER JOIN usuario_conejo uc ON c.conejoId = uc.conejoId
-    WHERE uc.usuarioId = ?
-    GROUP BY c.conejoId
-");
-$stmtC->execute([$usuarioId]);
-$misConejos = $stmtC->fetchAll();
+// 2. Obtener estado del juego (Conejos y Producción)
+$misConejos = $game->obtenerConejosUsuario($usuarioId);
+$produccionPorSegundo = $game->obtenerProduccionTotal($usuarioId);
+$valorClicActual = $game->obtenerValorClic($usuarioId);
 
-$produccionPorSegundo = $game->getProduccionTotal($usuarioId);
-$valorClicActual = $game->getClickValue($usuarioId);
-
-$stmtS = $pdo->prepare("SELECT clicsSucios FROM usuario WHERE usuarioId = ?");
-$stmtS->execute([$usuarioId]);
-$clicsActuales = $stmtS->fetchColumn();
+// 3. Evaluar el nivel de suciedad
+$clicsActuales = $game->obtenerClicsSucios($usuarioId);
 $estaSucio = ($clicsActuales >= 50);
 
-$stmtTodosLogros = $pdo->prepare("
-    SELECT l.nombre, l.descripcion, ul.fechaDesbloqueo 
-    FROM logro l
-    LEFT JOIN usuario_logro ul ON l.logroId = ul.logroId AND ul.usuarioId = ?
-    ORDER BY l.logroId ASC
-");
-$stmtTodosLogros->execute([$usuarioId]);
-$listaLogros = $stmtTodosLogros->fetchAll();
+// 4. Obtener el progreso de los logros
+$listaLogros = $game->obtenerLogrosUsuario($usuarioId);
 
+// 5. Cargar la vista pasándole todas las variables
 require_once 'views/home.view.php';

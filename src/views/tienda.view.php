@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bunnies & Tea - Tienda</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=2">
     <style>
         body {
             overflow-y: auto !important;
@@ -54,7 +54,7 @@
 </head>
 <body>
 
-    <nav class="nav-bar" style="justify-content: space-between; padding: 0 20px; display: flex; align-items: center; width: 100%; box-sizing: border-box;">
+    <nav class="barra-navegacion" style="justify-content: space-between; padding: 0 20px; display: flex; align-items: center; width: 100%; box-sizing: border-box;">
         <div style="display: flex; align-items: center;">
             <span class="nav-logo" style="margin-right: 20px;">BaT</span>
         </div>
@@ -128,7 +128,7 @@
         }
 
         setInterval(() => {
-            fetch('controllers/passiveProductionController.php')
+            fetch('controllers/controladorProduccionPasiva.php')
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'success') {
