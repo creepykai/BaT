@@ -12,7 +12,7 @@ $datosUsuario = $game->obtenerDatosUsuario($usuarioId);
 $puntosLegado = $datosUsuario['puntosLegado'] ?? 0;
 $monedasHistoricas = $datosUsuario['monedasHistoricas'] ?? 0;
 $hojasPendientes = floor($monedasHistoricas / 10000);
-$monedasParaSiguiente = 10000 - ($monedasHistoricas % 10000);
+$monedasParaSiguiente = 10000 - fmod((float)$monedasHistoricas, 10000);
 
 $misConejos = $game->obtenerConejosUsuario($usuarioId);
 $produccionPorSegundo = $game->obtenerProduccionTotal($usuarioId);
