@@ -1,4 +1,5 @@
 <?php
+//Pruebas unitarias para el catálogo y la compra de elementos en la tienda.
 require_once __DIR__ . '/BaseTestCase.php';
 require_once __DIR__ . '/../src/models/GestorTienda.php';
 

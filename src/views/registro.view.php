@@ -1,8 +1,5 @@
 <?php
-/**
- * Vista con el formulario para registrarse.
- * Muestra los campos para crear la cuenta y los mensajes de error/éxito correspondientes.
- */
+//Encargado de mostrar el formulario de registro.
 ?>
 <!DOCTYPE html>
 <html lang="es">

@@ -1,10 +1,8 @@
 <?php
-/**
- * Obtiene las estadísticas de progreso y logros desbloqueados del usuario.
- * Estos datos se usan para mostrarlos en el menú de ajustes o estadísticas.
- */
+//Archivo que devuelve los datos de los conejos que tiene cada usuario para representar la gráfica circular
 session_start();
 require_once '../db.php';
+require_once '../models/MotorJuego.php';
 
 if (!isset($_SESSION['usuarioId'])) {
     echo json_encode(['status' => 'error', 'message' => 'No autenticado']);
@@ -12,17 +10,10 @@ if (!isset($_SESSION['usuarioId'])) {
 }
 
 $usuarioId = $_SESSION['usuarioId'];
+$game = new MotorJuego($pdo);
 
 try {
-    $sql = "SELECT c.nombre, SUM(c.produccionBase) as produccionTotal, COUNT(uc.conejoId) as cantidad 
-            FROM usuario_conejo uc
-            JOIN conejo c ON uc.conejoId = c.conejoId
-            WHERE uc.usuarioId = ?
-            GROUP BY c.conejoId, c.nombre";
-            
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$usuarioId]);
-    $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $datos = $game->obtenerEstadisticasConejos($usuarioId);
 
     echo json_encode([
         'status' => 'success',

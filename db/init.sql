@@ -11,7 +11,7 @@ CREATE TABLE usuario (
     puntosLegado INT DEFAULT 0
 );
 
--- Tabla de Conejos (La tienda de animales)
+
 CREATE TABLE conejo (
     conejoId INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -20,7 +20,6 @@ CREATE TABLE conejo (
     costeBase DECIMAL(15,2) NOT NULL
 );
 
--- Relación Usuario-Conejo
 CREATE TABLE usuario_conejo (
     usuario_conejoId INT AUTO_INCREMENT PRIMARY KEY,
     usuarioId INT,
@@ -30,7 +29,6 @@ CREATE TABLE usuario_conejo (
     FOREIGN KEY (conejoId) REFERENCES conejo(conejoId) ON DELETE CASCADE
 );
 
--- Tabla de Utensilios (Las mejoras de tus clics)
 CREATE TABLE utensilio (
     utensilioId INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -40,7 +38,6 @@ CREATE TABLE utensilio (
     produccionPasivaExtra DECIMAL(10,2) DEFAULT 0.00
 );
 
--- Relación Usuario-Utensilio (Inventario de mejoras)
 CREATE TABLE usuario_utensilio (
     usuario_utensilioId INT AUTO_INCREMENT PRIMARY KEY,
     usuarioId INT,
@@ -49,11 +46,7 @@ CREATE TABLE usuario_utensilio (
     FOREIGN KEY (utensilioId) REFERENCES utensilio(utensilioId) ON DELETE CASCADE
 );
 
--- --------------------------------------------------------
--- NUEVAS TABLAS: SISTEMA DE LOGROS
--- --------------------------------------------------------
 
--- Tabla de Logros (Catálogo)
 CREATE TABLE logro (
     logroId INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -63,7 +56,7 @@ CREATE TABLE logro (
     multiplicadorRecompensa DECIMAL(5,2) NOT NULL DEFAULT 1.00
 );
 
--- Relación Usuario-Logro (Inventario de logros desbloqueados)
+
 CREATE TABLE usuario_logro (
     usuario_logroId INT AUTO_INCREMENT PRIMARY KEY,
     usuarioId INT,
@@ -73,24 +66,17 @@ CREATE TABLE usuario_logro (
     FOREIGN KEY (logroId) REFERENCES logro(logroId) ON DELETE CASCADE
 );
 
--- --------------------------------------------------------
--- INSERCIÓN DE DATOS INICIALES (TIENDA Y LOGROS)
--- --------------------------------------------------------
-
--- Tienda de Conejos
 INSERT INTO conejo (nombre, rol, produccionBase, costeBase) VALUES 
 ('Conejo Novato', 'Camarero', 1.00, 20.00),
 ('Conejo Chef', 'Cocinero', 5.00, 150.00),
 ('Conejo Mayordomo', 'Servicio VIP', 20.00, 850.00);
 
--- Tienda de Utensilios
 INSERT INTO utensilio (nombre, valorExtraClic, costeBase, limiteMax, produccionPasivaExtra) VALUES 
 ('Cuchara de Madera', 1.00, 50.00, 1, 0.00),
 ('Tetera de Porcelana', 5.00, 250.00, 1, 0.00),
 ('Cafetera Profesional', 0.00, 5000.00, 1, 15.00),
 ('Horno Industrial', 0.00, 25000.00, 1, 100.00);
 
--- Logros
 INSERT INTO logro (nombre, descripcion, tipoCondicion, valorCondicion, multiplicadorRecompensa) VALUES 
 ('Primer sorbo', 'Haz tu primer clic manual para preparar té.', 'clics', 1.00, 1.01),
 ('Amante del té', 'Acumula tus primeras 100 monedas históricas.', 'monedas_totales', 100.00, 1.05),

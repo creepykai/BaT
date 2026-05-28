@@ -1,8 +1,5 @@
 <?php
-/**
- * Clase encargada de gestionar los logros del jugador.
- * Comprueba las estadísticas y desbloquea los logros que se hayan cumplido.
- */
+//Clase encargada de gestionar los logros del jugador.
 class GestorLogros {
     private $pdo;
 
@@ -26,7 +23,7 @@ class GestorLogros {
         $stmtStats->execute([$usuarioId]);
         $monedasHistoricas = $stmtStats->fetchColumn();
 
-        $stmtConejos = $this->pdo->prepare("SELECT SUM(cantidad) as total_conejos FROM usuario_conejo WHERE usuarioId = ?");
+        $stmtConejos = $this->pdo->prepare("SELECT COUNT(*) as total_conejos FROM usuario_conejo WHERE usuarioId = ?");
         $stmtConejos->execute([$usuarioId]);
         $totalConejos = $stmtConejos->fetchColumn() ?: 0;
 

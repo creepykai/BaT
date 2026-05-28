@@ -1,84 +1,38 @@
 <?php
-/**
- * Recibe un archivo JSON y restaura la partida guardada del usuario.
- * Usa transacciones de PDO para evitar corromper la base de datos si el archivo es inválido.
- */
+//Archivo que recibe los datos de la copia de seguridad y restaura la partida
 session_start();
 require_once '../db.php';
 require_once '../models/GestorAutenticacion.php';
+require_once '../models/GestorPartida.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['partida_json'])) {
     
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '';
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Error: El formato del correo electrónico no es válido.");
+        die("Email invalido");
     }
     $pass = $_POST['password'] ?? '';
     
     $auth = new GestorAutenticacion($pdo);
     if (!$auth->iniciarSesion($email, $pass)) {
-        die("Error: Credenciales incorrectas.");
+        die("Credenciales incorrectas.");
     }
     
-    $usuarioId = $_SESSION['usuarioId'];
-
+$usuarioId = $_SESSION['usuarioId'];
+    // Abrimos el archivo temporal que acaba de subir el usuario y lo leemos
     $jsonContent = file_get_contents($_FILES['partida_json']['tmp_name']);
     $data = json_decode($jsonContent, true);
     
     if (!$data || !isset($data['jugador'])) {
-        die("Error: Archivo de guardado inválido.");
+        die("Archivo de guardado inválido.");
     }
     
-    try {
-        $pdo->beginTransaction();
-        
-        $jugador = $data['jugador'];
-        $stmtUpdateUser = $pdo->prepare("UPDATE usuario SET monedasActuales = ?, monedasHistoricas = ?, puntosLegado = ?, nombreCafeteria = ? WHERE usuarioId = ?");
-        $stmtUpdateUser->execute([
-            $jugador['monedasActuales'] ?? 0,
-            $jugador['monedasHistoricas'] ?? 0,
-            $jugador['puntosLegado'] ?? 0,
-            $jugador['nombreCafeteria'] ?? 'Cafetería',
-            $usuarioId
-        ]);
-        
-        $pdo->prepare("DELETE FROM usuario_conejo WHERE usuarioId = ?")->execute([$usuarioId]);
-        $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?")->execute([$usuarioId]);
-        
-        if (!empty($data['inventario_conejos'])) {
-            $stmtConejoId = $pdo->prepare("SELECT conejoId FROM conejo WHERE nombre = ?");
-            $stmtInsertConejo = $pdo->prepare("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (?, ?)");
-            
-            foreach ($data['inventario_conejos'] as $conejoGuardado) {
-                $stmtConejoId->execute([$conejoGuardado['nombre']]);
-                $conejoId = $stmtConejoId->fetchColumn();
-                if ($conejoId) {
-                    for ($i = 0; $i < $conejoGuardado['cantidad']; $i++) {
-                        $stmtInsertConejo->execute([$usuarioId, $conejoId]);
-                    }
-                }
-            }
-        }
-        
-        if (!empty($data['inventario_utensilios'])) {
-            $stmtUtensilioId = $pdo->prepare("SELECT utensilioId FROM utensilio WHERE nombre = ?");
-            $stmtInsertUtensilio = $pdo->prepare("INSERT INTO usuario_utensilio (usuarioId, utensilioId) VALUES (?, ?)");
-            
-            foreach ($data['inventario_utensilios'] as $utensilioGuardado) {
-                $stmtUtensilioId->execute([$utensilioGuardado['nombre']]);
-                $utensilioId = $stmtUtensilioId->fetchColumn();
-                if ($utensilioId) {
-                    $stmtInsertUtensilio->execute([$usuarioId, $utensilioId]);
-                }
-            }
-        }
-        
-        $pdo->commit();
+    $gestorPartida = new GestorPartida($pdo);
+
+    if ($gestorPartida->importarPartida($usuarioId, $data)) {
         header("Location: ../index.php");
         exit();
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        error_log("Error de importación JSON: " . $e->getMessage());
+    } else {
         die("Error: El archivo de guardado está corrupto o es inválido.");
     }
 }

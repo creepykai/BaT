@@ -1,4 +1,5 @@
 <?php
+//Clase base para configurar el entorno de pruebas y la base de datos en memoria.
 use PHPUnit\Framework\TestCase;
 
 abstract class BaseTestCase extends TestCase {
@@ -45,13 +46,26 @@ abstract class BaseTestCase extends TestCase {
 
             CREATE TABLE usuario_conejo (
                 usuarioId INTEGER,
-                conejoId INTEGER,
-                cantidad INTEGER DEFAULT 1
+                conejoId INTEGER
             );
 
             CREATE TABLE usuario_utensilio (
                 usuarioId INTEGER,
                 utensilioId INTEGER
+            );
+
+            CREATE TABLE logro (
+                logroId INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT,
+                descripcion TEXT,
+                tipoCondicion TEXT,
+                valorCondicion REAL
+            );
+
+            CREATE TABLE usuario_logro (
+                usuarioId INTEGER,
+                logroId INTEGER,
+                fechaDesbloqueo DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         ");
 

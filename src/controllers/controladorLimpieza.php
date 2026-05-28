@@ -1,10 +1,7 @@
 <?php
-/**
- * Se llama por AJAX cuando se pulsa el botón de limpiar en la cafetería.
- * Comprueba si el jugador tiene monedas suficientes para limpiar y resetea la suciedad.
- */
 session_start();
 require_once '../db.php';
+require_once '../models/MotorJuego.php';
 
 if (!isset($_SESSION['usuarioId'])) { 
     echo json_encode(["status" => "error", "message" => "No autenticado"]);
@@ -12,25 +9,20 @@ if (!isset($_SESSION['usuarioId'])) {
 }
 
 $usuarioId = $_SESSION['usuarioId'];
-$costoLimpieza = 20.00;
+$game = new MotorJuego($pdo);
 
-$stmt = $pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
-$stmt->execute([$usuarioId]);
-$monedas = $stmt->fetchColumn();
+$resultado = $game->limpiarCafeteria($usuarioId);
 
-if ($monedas >= $costoLimpieza) {
-    $stmtUpdate = $pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales - ?, clicsSucios = 0 WHERE usuarioId = ?");
-    $stmtUpdate->execute([$costoLimpieza, $usuarioId]);
-    
+if ($resultado['exito']) {
     echo json_encode([
         "status" => "success", 
-        "new_balance" => $monedas - $costoLimpieza,
+        "new_balance" => $resultado['nuevoSaldo'],
         "clics_sucios" => 0
     ]);
 } else {
     echo json_encode([
         "status" => "error", 
-        "message" => "No tienes suficientes monedas para limpiar (Cuesta 20)."
+        "message" => "No tienes suficientes monedas para limpiar (Cuesta " . MotorJuego::COSTO_LIMPIEZA . ")."
     ]);
 }
 ?>

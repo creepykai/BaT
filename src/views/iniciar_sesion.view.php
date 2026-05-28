@@ -1,8 +1,5 @@
 <?php
-/**
- * Vista con el formulario de inicio de sesión.
- * Solo contiene el HTML y algo de PHP para mostrar errores si los hay.
- */
+//Vista con el formulario de inicio de sesión.
 ?>
 <!DOCTYPE html>
 <html lang="es">

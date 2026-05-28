@@ -1,7 +1,11 @@
 <?php
 /**
  * Vista del catálogo de la tienda.
- * Recorre los arrays de conejos y utensilios que le pasa el controlador para crear las tarjetas HTML.
+ * @var float $misMonedas
+ * @var array $catalogoConejos
+ * @var array $catalogoUtensilios
+ * @var string $mensaje
+ * @var string $activeTab
  */
 ?>
 <!DOCTYPE html>

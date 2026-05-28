@@ -14,11 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pass = $_POST['password'];
 
     if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Error: El formato del correo electrónico no es válido.");
+        die("Email invalido");
     }
 
     if ($auth->registrarUsuario($email, $pass)) {
-        header("Location: iniciar_sesion.php");
+        echo "<script>window.location.href='iniciar_sesion.php';</script>";
         exit();
     } else {
         $mensaje = "<p style='color: red;'>Error: El email ya existe o hay un problema técnico.</p>";

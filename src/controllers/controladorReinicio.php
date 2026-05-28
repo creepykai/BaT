@@ -1,8 +1,5 @@
 <?php
-/**
- * Gestiona el sistema de prestigio.
- * Reinicia la partida del jugador a cero, dándole a cambio "puntos de legado".
- */
+//Encargado del sistema de prestigio reinicia la partida del jugador a cero
 session_start();
 require_once '../db.php';
 
@@ -12,40 +9,15 @@ if (!isset($_SESSION['usuarioId'])) {
 }
 
 $usuarioId = $_SESSION['usuarioId'];
+require_once '../models/MotorJuego.php';
+$game = new MotorJuego($pdo);
 
-try {
-    $pdo->beginTransaction();
+$resultado = $game->reiniciarPartida($usuarioId);
 
-    $stmt = $pdo->prepare("SELECT monedasHistoricas FROM usuario WHERE usuarioId = ?");
-    $stmt->execute([$usuarioId]);
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    $monedasHistoricas = $resultado ? (float)$resultado['monedasHistoricas'] : 0;
-    
-    $nuevasHojas = floor($monedasHistoricas / 10000);
-
-    $stmtDelC = $pdo->prepare("DELETE FROM usuario_conejo WHERE usuarioId = ?");
-    $stmtDelC->execute([$usuarioId]);
-
-    $stmtDelU = $pdo->prepare("DELETE FROM usuario_utensilio WHERE usuarioId = ?");
-    $stmtDelU->execute([$usuarioId]);
-
-    $stmtUpdate = $pdo->prepare("UPDATE usuario 
-                                 SET monedasActuales = 0, 
-                                     monedasHistoricas = 0, 
-                                     clicsSucios = 0, 
-                                     puntosLegado = puntosLegado + ? 
-                                 WHERE usuarioId = ?");
-    $stmtUpdate->execute([$nuevasHojas, $usuarioId]);
-
-    $pdo->commit();
-
+if ($resultado['exito']) {
     echo json_encode(['status' => 'success']);
-    exit();
-
-} catch (Exception $e) {
-    $pdo->rollBack();
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    exit();
+} else {
+    echo json_encode(['status' => 'error', 'message' => $resultado['error'] ?? 'Error al reiniciar']);
 }
+exit();
 ?>

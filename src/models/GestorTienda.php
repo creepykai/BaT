@@ -1,8 +1,4 @@
 <?php
-/**
- * Modelo que gestiona la lógica de la tienda.
- * Calcula los precios de los conejos, que van subiendo con cada compra, y actualiza el inventario.
- */
 class GestorTienda {
     private $pdo;
 
@@ -10,7 +6,15 @@ class GestorTienda {
         $this->pdo = $pdo;
     }
 
+    public function obtenerMonedas($usuarioId) {
+        // Devuelve las monedas actuales del usuario
+        $stmt = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
+        $stmt->execute([$usuarioId]);
+        return $stmt->fetchColumn();
+    }
+
     public function obtenerCatalogo($usuarioId) {
+        //Obtenemos el catálogo base con una subconsulta para ver cuántos tiene ya el usuario.
         $sql = "SELECT c.*, 
                 (SELECT COUNT(*) FROM usuario_conejo uc WHERE uc.conejoId = c.conejoId AND uc.usuarioId = ?) as cantidadPoseida
                 FROM conejo c 
@@ -28,6 +32,7 @@ class GestorTienda {
 
     public function comprarConejo($usuarioId, $conejoId) {
         try {
+            // Congelamos la base de datos para asegurar que o se hace toda la compra entera
             $this->pdo->beginTransaction();
 
             $stmtC = $this->pdo->prepare("SELECT costeBase FROM conejo WHERE conejoId = ?");
@@ -38,6 +43,8 @@ class GestorTienda {
             $stmtCheck->execute([$usuarioId, $conejoId]);
             $cantidadActual = $stmtCheck->fetchColumn();
 
+            //Cada conejo que tienes hace que el siguiente sea un 15% más caro
+            //redondeamos el número para que siempre acabe en 0 o 5 (ceil / 5 * 5)
             $costeActual = ceil(($conejo['costeBase'] * pow(1.15, $cantidadActual)) / 5) * 5;
 
             $stmtU = $this->pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
@@ -45,20 +52,24 @@ class GestorTienda {
             $usuario = $stmtU->fetch();
 
             if (!$conejo || $usuario['monedasActuales'] < $costeActual) {
+                // Si no hay dinero cancelamos la transacción
                 $this->pdo->rollBack();
                 return false; 
             }
 
+            //Cobrar y entregar 
             $stmtUpdate = $this->pdo->prepare("UPDATE usuario SET monedasActuales = monedasActuales - ? WHERE usuarioId = ?");
             $stmtUpdate->execute([$costeActual, $usuarioId]);
 
             $stmtInsert = $this->pdo->prepare("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (?, ?)");
             $stmtInsert->execute([$usuarioId, $conejoId]);
 
+            //Todo ha ido bien, guardamos los cambios definitivamente
             $this->pdo->commit();
             return true;
 
         } catch (Exception $e) {
+            //Si cualquier cosa explota no cobramos nada
             $this->pdo->rollBack();
             return false;
         }

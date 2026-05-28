@@ -1,4 +1,5 @@
 <?php
+//Pruebas unitarias para el registro y autenticación de usuarios.
 require_once __DIR__ . '/BaseTestCase.php';
 require_once __DIR__ . '/../src/models/GestorAutenticacion.php';
 

@@ -1,9 +1,4 @@
 <?php
-/**
- * Controlador de la tienda.
- * Obtiene el catálogo usando GestorTienda y carga la vista correspondiente.
- * También procesa las peticiones de compra.
- */
 require_once 'verificar_sesion.php';
 require_once 'db.php';
 require_once 'models/GestorTienda.php';
@@ -21,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['conejoId'])) {
         $activeTab = 'personal';
         $conejoId = filter_input(INPUT_POST, 'conejoId', FILTER_VALIDATE_INT);
+        
         if ($conejoId && $shop->comprarConejo($usuarioId, $conejoId)) {
             $mensaje = "<div class='alert success'>¡Nuevo conejo contratado!</div>";
             $nuevosLogros = $achievements->chequearLogros($usuarioId);
@@ -35,8 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['utensilioId'])) {
         $activeTab = 'utensilios';
         $utensilioId = filter_input(INPUT_POST, 'utensilioId', FILTER_VALIDATE_INT);
+        
         if ($utensilioId && $shop->comprarUtensilio($usuarioId, $utensilioId)) {
             $mensaje = "<div class='alert success'>¡Utensilio mejorado!</div>";
+            
             $nuevosLogros = $achievements->chequearLogros($usuarioId);
             if (!empty($nuevosLogros)) {
                 $logrosDesbloqueados = array_merge($logrosDesbloqueados, $nuevosLogros);
@@ -49,9 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $catalogoConejos = $shop->obtenerCatalogo($usuarioId);
 $catalogoUtensilios = $shop->obtenerCatalogoUtensilios($usuarioId);
+$misMonedas = $shop->obtenerMonedas($usuarioId);
 
-$stmt = $pdo->prepare("SELECT monedasActuales FROM usuario WHERE usuarioId = ?");
-$stmt->execute([$usuarioId]);
-$misMonedas = $stmt->fetchColumn();
 
 require_once 'views/tienda.view.php';

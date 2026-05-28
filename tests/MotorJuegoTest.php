@@ -1,4 +1,5 @@
 <?php
+//Pruebas unitarias para el cálculo de clics, suciedad y producción de la granja.
 require_once __DIR__ . '/BaseTestCase.php';
 require_once __DIR__ . '/../src/models/MotorJuego.php';
 
@@ -27,7 +28,7 @@ class MotorJuegoTest extends BaseTestCase {
 
     public function test_obtenerProduccionTotal_limpio() {
         $this->pdo->exec("INSERT INTO conejo (conejoId, nombre, produccionBase) VALUES (1, 'Conejo Básico', 10)");
-        $this->pdo->exec("INSERT INTO usuario_conejo (usuarioId, conejoId, cantidad) VALUES (1, 1, 1)");
+        $this->pdo->exec("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (1, 1)");
 
         $this->pdo->exec("INSERT INTO utensilio (utensilioId, nombre, produccionPasivaExtra) VALUES (2, 'Horno', 5)");
         $this->pdo->exec("INSERT INTO usuario_utensilio (usuarioId, utensilioId) VALUES (1, 2)");
@@ -41,7 +42,7 @@ class MotorJuegoTest extends BaseTestCase {
         $this->pdo->exec("UPDATE usuario SET clicsSucios = 60 WHERE usuarioId = 1");
         
         $this->pdo->exec("INSERT INTO conejo (conejoId, nombre, produccionBase) VALUES (1, 'Conejo Básico', 10)");
-        $this->pdo->exec("INSERT INTO usuario_conejo (usuarioId, conejoId, cantidad) VALUES (1, 1, 1)");
+        $this->pdo->exec("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (1, 1)");
 
         $produccion = $this->MotorJuego->obtenerProduccionTotal(1);
         
@@ -68,7 +69,7 @@ class MotorJuegoTest extends BaseTestCase {
         $this->assertEquals(1.10, $multiplicador);
 
         $this->pdo->exec("INSERT INTO conejo (conejoId, nombre, produccionBase) VALUES (1, 'Conejo Básico', 10)");
-        $this->pdo->exec("INSERT INTO usuario_conejo (usuarioId, conejoId, cantidad) VALUES (1, 1, 1)");
+        $this->pdo->exec("INSERT INTO usuario_conejo (usuarioId, conejoId) VALUES (1, 1)");
 
         $produccion = $this->MotorJuego->obtenerProduccionTotal(1);
         

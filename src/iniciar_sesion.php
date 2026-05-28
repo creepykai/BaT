@@ -1,10 +1,5 @@
 <?php
-/**
- * Archivo que procesa el inicio de sesión.
- * Recibe los datos por POST y delega la comprobación al GestorAutenticacion.
- * Si todo va bien, redirige al juego. Si no, muestra error en la vista.
- */
-
+//Archivo que procesa el inicio de sesión.
 require_once 'db.php';
 require_once 'models/GestorAutenticacion.php';
 
@@ -19,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($auth->iniciarSesion($email, $pass)) {
 
-        header("Location: index.php");
+        echo "<script>window.location.href='index.php';</script>";
         exit();
     } else {
 

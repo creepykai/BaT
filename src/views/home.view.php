@@ -1,5 +1,22 @@
+<?php
+
+/**
+ * @var array $datosUsuario
+ * @var float $produccionPorSegundo
+ * @var float $valorClicActual
+ * @var int $clicsActuales
+ * @var bool $estaSucio
+ * @var int $puntosLegado
+ * @var float $monedasHistoricas
+ * @var int $hojasPendientes
+ * @var float $monedasParaSiguiente
+ * @var array $misConejos
+ * @var array $listaLogros
+ */
+?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,6 +25,7 @@
     <link rel="stylesheet" href="assets/css/style.css?v=2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="<?php echo $estaSucio ? 'cafeteria-sucia' : ''; ?>">
 
     <nav class="barra-navegacion" style="justify-content: space-between; padding: 0 20px;">
@@ -37,13 +55,13 @@
             ¡La cafetería está muy sucia! La producción de los conejos se ha reducido a la mitad.
             <button id="btn-limpiar">Limpiar (20 🪙)</button>
         </div>
-        
+
         <div class="stats-personal">
             <h3>Personal Contratado</h3>
             <?php if (empty($misConejos)): ?>
                 <p style="font-size: 0.9em; opacity: 0.7;">No hay personal trabajando.</p>
             <?php else: ?>
-                <?php foreach($misConejos as $conejito): ?>
+                <?php foreach ($misConejos as $conejito): ?>
                     <div style="margin-bottom: 8px;">
                         <strong>x<?php echo $conejito['total']; ?></strong> <?php echo htmlspecialchars($conejito['nombre']); ?>
                     </div>
@@ -54,18 +72,18 @@
         <div id="status-limpieza" class="stats-personal" style="top: 220px; border-color: <?php echo $estaSucio ? '#e57373' : '#81c784'; ?>">
             <p style="margin: 0 0 5px 0;">Estado: <strong id="texto-suciedad"><?php echo $estaSucio ? "¡MUY SUCIO!" : "Limpio"; ?></strong></p>
             <div style="background: #eee; height: 10px; border-radius: 5px;">
-                <div id="barra-suciedad" style="background: var(--primary); height: 100%; width: <?php echo min(100, ($clicsActuales/50)*100); ?>%; transition: 0.3s; max-width: 100%;"></div>
+                <div id="barra-suciedad" style="background: var(--primary); height: 100%; width: <?php echo min(100, ($clicsActuales / 50) * 100); ?>%; transition: 0.3s; max-width: 100%;"></div>
             </div>
         </div>
 
         <div id="contenedor-conejos" style="font-size: 100px;">
-        </div> 
-        
+        </div>
+
         <div id="venta-notif" class="notification">¡Venta!</div>
 
         <div id="clicker-btn">
             <div class="btn-label">SERVIR<br>TÉ</div>
-        </div> 
+        </div>
     </main>
 
     <div id="modal-ajustes" class="modal-oculto">
@@ -83,15 +101,15 @@
                     <h3 style="text-align: center; color: #5D4037; font-size: 16px; margin-bottom: 10px;">Rendimiento</h3>
                     <canvas id="graficoProduccion"></canvas>
                 </div>
-                
+
                 <div style="background-color: #fdf6f0; border: 1px dashed #d4a373; border-radius: 8px; padding: 15px; text-align: center;">
                     <h4 style="margin: 0 0 10px 0; color: #5D4037;">Prestigio de la Cafetería</h4>
                     <p style="margin: 0; font-size: 14px; color: #6d4c41;">
                         Si reinicias ahora, ganarás: <br>
-                        <strong style="font-size: 18px; color: #81C784;">+<?= $hojasPendientes ?> Hojas de Té Doradas</strong>
+                        <strong id="hojas-pendientes" style="font-size: 18px; color: #81C784;">+<?= $hojasPendientes ?> Hojas de Té Doradas</strong>
                     </p>
                     <p style="margin: 10px 0 0 0; font-size: 12px; color: #8D6E63; opacity: 0.9;">
-                        <em>(Faltan <strong><?= number_format($monedasParaSiguiente, 2) ?></strong> monedas históricas).</em>
+                        <em>(Faltan <strong id="monedas-siguiente"><?= number_format($monedasParaSiguiente, 2) ?></strong> monedas históricas).</em>
                     </p>
                 </div>
             </div>
@@ -99,15 +117,15 @@
             <div id="tab-logros" class="seccion-ajustes" style="display: none;">
                 <div style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 10px;">
                     <?php foreach ($listaLogros as $logro): ?>
-                        <?php 
-                            $desbloqueado = !empty($logro['fechaDesbloqueo']); 
-                            $bg = $desbloqueado ? '#fdf6f0' : '#f5f5f5';
-                            $border = $desbloqueado ? '#d4a373' : '#e0e0e0';
-                            $opacity = $desbloqueado ? '1' : '0.6';
-                            $filter = $desbloqueado ? 'none' : 'grayscale(100%)';
-                            $icon = $desbloqueado ? '✓' : 'x';
-                            $titleColor = $desbloqueado ? '#5D4037' : '#9e9e9e';
-                            $descColor = $desbloqueado ? '#8D6E63' : '#9e9e9e';
+                        <?php
+                        $desbloqueado = !empty($logro['fechaDesbloqueo']);
+                        $bg = $desbloqueado ? '#fdf6f0' : '#f5f5f5';
+                        $border = $desbloqueado ? '#d4a373' : '#e0e0e0';
+                        $opacity = $desbloqueado ? '1' : '0.6';
+                        $filter = $desbloqueado ? 'none' : 'grayscale(100%)';
+                        $icon = $desbloqueado ? '✓' : 'x';
+                        $titleColor = $desbloqueado ? '#5D4037' : '#9e9e9e';
+                        $descColor = $desbloqueado ? '#8D6E63' : '#9e9e9e';
                         ?>
                         <div class="logro-item" data-nombre="<?= htmlspecialchars($logro['nombre']) ?>" style="display: flex; align-items: center; padding: 12px; border-radius: 8px; background-color: <?= $bg ?>; border: 1px solid <?= $border ?>; opacity: <?= $opacity ?>; filter: <?= $filter ?>; transition: all 0.3s ease;">
                             <div style="font-size: 24px; margin-right: 15px; min-width: 30px; text-align: center; color: <?= $titleColor ?>;">
@@ -128,7 +146,7 @@
 
             <div id="tab-opciones" class="seccion-ajustes" style="display: none; text-align: center; padding-top: 20px;">
                 <button id="btn-reiniciar-partida" class="btn-config btn-peligro">Reiniciar Partida</button>
-                <a href="controllers/controladorExportacion.php" class="btn-config" style="background-color: #5d4037; color: white;">Descargar Partida (.json)</a>
+                <button onclick="descargarPartida()" class="btn-config" style="background-color: #5d4037; color: white; border:none; cursor:pointer; font-family: 'Fredoka One', cursive;">Descargar Partida (.json)</button>
                 <a href="cerrar_sesion.php" class="btn-config btn-salir">Cerrar Sesión</a>
             </div>
 
@@ -138,6 +156,26 @@
     </div>
 
     <script>
+        function descargarPartida() {
+            fetch('controllers/controladorExportacion.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data.data, null, 2));
+                        const downloadAnchorNode = document.createElement('a');
+                        downloadAnchorNode.setAttribute("href", dataStr);
+                        const fecha = new Date().toISOString().split('T')[0];
+                        downloadAnchorNode.setAttribute("download", "Bunnies_And_Tea_Guardado_" + fecha + ".json");
+                        document.body.appendChild(downloadAnchorNode);
+                        downloadAnchorNode.click();
+                        downloadAnchorNode.remove();
+                    } else {
+                        alert("Error al descargar la partida: " + data.message);
+                    }
+                })
+                .catch(err => alert("Error de conexión al exportar."));
+        }
+
         const displayMonedas = document.getElementById('monedas-total');
         const botonClicker = document.getElementById('clicker-btn');
         const notificacion = document.getElementById('venta-notif');
@@ -146,149 +184,161 @@
         let clicsPendientes = 0;
         let valorClicVisual = parseFloat(<?php echo $valorClicActual; ?>);
         let monedasVisuales = parseFloat(<?php echo $datosUsuario['monedasActuales']; ?>);
+        let monedasHistoricasJS = parseFloat(<?php echo $monedasHistoricas; ?>);
+
+        function actualizarPrestigioUI() {
+            //Calcula las hojas que faltan por conseguir para el siguiente prestigio
+            let hojas = Math.floor(monedasHistoricasJS / 10000);
+            let faltan = 10000 - (monedasHistoricasJS % 10000);
+
+            const elemHojas = document.getElementById('hojas-pendientes');
+            const elemFaltan = document.getElementById('monedas-siguiente');
+            if (elemHojas) elemHojas.innerText = "+" + hojas + " Hojas de Té Doradas";
+            if (elemFaltan) elemFaltan.innerText = faltan.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
 
         botonClicker.addEventListener('click', () => {
             clicsPendientes++;
             monedasVisuales += valorClicVisual;
+            monedasHistoricasJS += valorClicVisual;
             displayMonedas.innerText = monedasVisuales.toFixed(2);
             animarNotificacion(valorClicVisual);
+            actualizarPrestigioUI();
         });
 
         document.getElementById('btn-limpiar').addEventListener('click', () => {
+            // Le pregunta al controlador si se puede limpiar y si lo es, lo limpia y si no salta una alerta
             fetch('controllers/controladorLimpieza.php', {
                 method: 'POST'
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    monedasVisuales = parseFloat(data.new_balance);
-                    displayMonedas.innerText = monedasVisuales.toFixed(2);
-                    
-                    document.body.classList.remove('cafeteria-sucia');
-                    document.getElementById('aviso-penalizacion').style.display = 'none';
-                    
-                    const barra = document.getElementById('barra-suciedad');
-                    const texto = document.getElementById('texto-suciedad');
-                    const panel = document.getElementById('status-limpieza');
-                    barra.style.width = "0%";
-                    texto.innerText = "Limpio";
-                    panel.style.borderColor = '#81c784';
-                } else {
-                    alert("No puedes limpiar: " + data.message);
-                }
-            })
-            .catch(error => console.error(error));
+                .then(res => res.json()) 
+                .then(data => {
+                    if (data.status === 'success') {
+                        monedasVisuales = parseFloat(data.new_balance);
+                        displayMonedas.innerText = monedasVisuales.toFixed(2);
+
+                        document.body.classList.remove('cafeteria-sucia');
+                        document.getElementById('aviso-penalizacion').style.display = 'none';
+
+                        const barra = document.getElementById('barra-suciedad');
+                        const texto = document.getElementById('texto-suciedad');
+                        const panel = document.getElementById('status-limpieza');
+                        barra.style.width = "0%";
+                        texto.innerText = "Limpio";
+                        panel.style.borderColor = '#81c784';
+                    } else {
+                        alert("No puedes limpiar: " + data.message);
+                    }
+                })
+                .catch(error => console.error(error)); 
         });
 
         function animarNotificacion(cantidad) {
             notificacion.innerText = "¡Venta! +" + parseFloat(cantidad).toFixed(2);
             notificacion.classList.add('show');
-            setTimeout(() => { notificacion.classList.remove('show'); }, 1000);
+            setTimeout(() => {
+                notificacion.classList.remove('show');
+            }, 1000);
+        }
+
+        function actualizarEstadoGlobal(data) {
+            if (data.clics_sucios !== undefined) {
+                const clics = data.clics_sucios;
+                const barra = document.getElementById('barra-suciedad');
+                const texto = document.getElementById('texto-suciedad');
+                const panel = document.getElementById('status-limpieza');
+
+                const porcentaje = Math.min((clics / 50) * 100, 100);
+                barra.style.width = porcentaje + "%";
+
+                if (clics >= 50) {
+                    texto.innerText = "¡MUY SUCIO!";
+                    panel.style.borderColor = '#e57373';
+                    document.getElementById('aviso-penalizacion').style.display = 'block';
+                    document.body.classList.add('cafeteria-sucia');
+                } else {
+                    texto.innerText = "Limpio";
+                    panel.style.borderColor = '#81c784';
+                    document.getElementById('aviso-penalizacion').style.display = 'none';
+                    document.body.classList.remove('cafeteria-sucia');
+                }
+            }
+
+            if (data.logros_nuevos && data.logros_nuevos.length > 0) {
+                data.logros_nuevos.forEach(logro => {
+                    mostrarLogro(logro.nombre, logro.descripcion);
+                });
+            }
         }
 
         setInterval(() => {
+            //Cada 3 segundos si se han pulsado clics, se suman a la cuenta
+            //Tambien actualiza la suciedad y los logros 
             if (clicsPendientes > 0) {
                 let clicsAEnviar = clicsPendientes;
-                clicsPendientes = 0; 
-                peticionesEnVuelo++;
-
-                fetch('controllers/controladorMonedas.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ clics: clicsAEnviar })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    peticionesEnVuelo--;
-                    if (data.status === 'success') {
-                        if (peticionesEnVuelo === 0 && clicsPendientes === 0) {
-                            monedasVisuales = parseFloat(data.new_balance);
-                            displayMonedas.innerText = monedasVisuales.toFixed(2);
-                        }
-                        
-                        if (data.clics_sucios !== undefined) {
-                            const clics = data.clics_sucios;
-                            const barra = document.getElementById('barra-suciedad');
-                            const texto = document.getElementById('texto-suciedad');
-                            const panel = document.getElementById('status-limpieza');
-
-                            const porcentaje = Math.min((clics / 50) * 100, 100);
-                            barra.style.width = porcentaje + "%";
-
-                            if (clics >= 50) {
-                                texto.innerText = "¡MUY SUCIO!";
-                                panel.style.borderColor = '#e57373';
-                                document.getElementById('aviso-penalizacion').style.display = 'block';
-                                document.body.classList.add('cafeteria-sucia');
-                            } else {
-                                texto.innerText = "Limpio";
-                                panel.style.borderColor = '#81c784';
-                                document.getElementById('aviso-penalizacion').style.display = 'none';
-                                document.body.classList.remove('cafeteria-sucia');
+                clicsPendientes = 0;
+                peticionesEnVuelo++; 
+                fetch('controllers/controladorClics.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            clics: clicsAEnviar
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        peticionesEnVuelo--; 
+                        if (data.status === 'success') {
+                            
+                            if (peticionesEnVuelo === 0 && clicsPendientes === 0) {
+                                monedasVisuales = parseFloat(data.new_balance);
+                                displayMonedas.innerText = monedasVisuales.toFixed(2);
                             }
+                            actualizarEstadoGlobal(data);
                         }
-
-                        if (data.logros_nuevos && data.logros_nuevos.length > 0) {
-                            data.logros_nuevos.forEach(logro => {
-                                mostrarLogro(logro.nombre, logro.descripcion);
-                            });
-                        }
-                    }
-                })
-                .catch(error => { peticionesEnVuelo--; console.error(error); });
+                    })
+                    .catch(error => {
+                        peticionesEnVuelo--;
+                        console.error(error);
+                    });
             }
         }, 3000);
 
         setInterval(() => {
             peticionesEnVuelo++;
             fetch('controllers/controladorProduccionPasiva.php')
-            .then(response => response.json())
-            .then(data => {
-                peticionesEnVuelo--;
-                if (data.status === 'success') {
-                    if (data.produccion_pasiva !== undefined) {
-                        monedasVisuales += parseFloat(data.produccion_pasiva);
-                        displayMonedas.innerText = monedasVisuales.toFixed(2);
-                    }
-
-                    if (peticionesEnVuelo === 0 && clicsPendientes === 0) {
-                        monedasVisuales = parseFloat(data.new_balance);
-                        displayMonedas.innerText = monedasVisuales.toFixed(2);
-                    }
-                    
-                    if (data.current_pps !== undefined) {
-                        document.getElementById('pps-display').innerText = parseFloat(data.current_pps).toFixed(2);
-                    }
-
-                    if (data.clics_sucios !== undefined) {
-                        const clics = data.clics_sucios;
-                        const barra = document.getElementById('barra-suciedad');
-                        const texto = document.getElementById('texto-suciedad');
-                        const panel = document.getElementById('status-limpieza');
-
-                        const porcentaje = Math.min((clics / 50) * 100, 100);
-                        barra.style.width = porcentaje + "%";
-
-                        if (clics >= 50) {
-                            texto.innerText = "¡MUY SUCIO!";
-                            panel.style.borderColor = '#e57373';
-                            document.getElementById('aviso-penalizacion').style.display = 'block';
-                            document.body.classList.add('cafeteria-sucia');
-                        } else {
-                            texto.innerText = "Limpio";
-                            panel.style.borderColor = '#81c784';
-                            document.getElementById('aviso-penalizacion').style.display = 'none';
-                            document.body.classList.remove('cafeteria-sucia');
+                .then(response => response.json()) 
+                .then(data => {
+                    peticionesEnVuelo--;
+                    if (data.status === 'success') {
+                        if (data.produccion_pasiva !== undefined) {
+                            let prod = parseFloat(data.produccion_pasiva);
+                            monedasVisuales += prod;
+                            monedasHistoricasJS += prod;
+                            displayMonedas.innerText = monedasVisuales.toFixed(2);
+                            actualizarPrestigioUI();
                         }
-                        if (data.logros_nuevos && data.logros_nuevos.length > 0) {
-                            data.logros_nuevos.forEach(logro => {
-                                mostrarLogro(logro.nombre, logro.descripcion);
-                            });
+
+                        if (peticionesEnVuelo === 0 && clicsPendientes === 0) {
+                            monedasVisuales = parseFloat(data.new_balance);
+                            displayMonedas.innerText = monedasVisuales.toFixed(2);
                         }
+
+                        if (data.current_pps !== undefined) {
+                            document.getElementById('pps-display').innerText = parseFloat(data.current_pps).toFixed(2);
+                        }
+                        actualizarEstadoGlobal(data);
                     }
-                }
-            })
-            .catch(error => { peticionesEnVuelo--; console.error(error); });
+                })
+                .catch(error => {
+                    peticionesEnVuelo--;
+                    console.error(error);
+                });
         }, 1000);
 
         const modalAjustes = document.getElementById('modal-ajustes');
@@ -300,9 +350,11 @@
 
         document.getElementById('btn-reiniciar-partida').addEventListener('click', () => {
             const confirmar = confirm("¿Estás seguro de que quieres empezar de cero? Perderás todos tus empleados y monedas.");
-            
+
             if (confirmar) {
-                fetch('controllers/controladorReinicio.php', { method: 'POST' })
+                fetch('controllers/controladorReinicio.php', {
+                        method: 'POST'
+                    })
                     .then(respuesta => respuesta.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -317,7 +369,9 @@
                     });
             }
         });
+
         function mostrarLogro(nombre, descripcion) {
+            //Es la notificación de que has conseguido un logro
             const container = document.getElementById('toast-container');
             if (!container) return;
 
@@ -326,7 +380,7 @@
             const toast = document.createElement('div');
             toast.className = 'toast-logro';
             toast.innerHTML = `<strong>¡LOGRO DESBLOQUEADO!</strong><br><span style="font-size: 14px;">${nombre}: ${descripcion}</span>`;
-            
+
             container.appendChild(toast);
 
             setTimeout(() => toast.classList.add('show'), 10);
@@ -338,13 +392,15 @@
         }
 
         function actualizarLogroEnUI(nombre) {
+            //Actualiza los logros para que se vean de colores y no en blanco y negro
             try {
                 document.querySelectorAll('.logro-item').forEach(item => {
                     const dataNombre = item.getAttribute('data-nombre');
+                    
                     const temp = document.createElement('textarea');
                     temp.innerHTML = dataNombre;
                     const decodedDataNombre = temp.value;
-                    
+
                     temp.innerHTML = nombre;
                     const decodedNombre = temp.value;
 
@@ -352,14 +408,14 @@
                         item.style.backgroundColor = '#fdf6f0';
                         item.style.borderColor = '#d4a373';
                         item.style.opacity = '1';
-                        item.style.filter = 'none';
-                        
+                        item.style.filter = 'none'; 
+
                         if (item.children.length > 0) {
                             const iconDiv = item.children[0];
                             iconDiv.style.color = '#5D4037';
                             iconDiv.innerText = '✓';
                         }
-                        
+
                         if (item.children.length > 1) {
                             const textDiv = item.children[1];
                             if (textDiv.children.length > 0) textDiv.children[0].style.color = '#5D4037';
@@ -367,54 +423,83 @@
                         }
                     }
                 });
-            } catch(e) {
+            } catch (e) {
                 console.error("Error al actualizar logro en UI:", e);
             }
         }
 
+        //Guardamos el gráfico actual aquí para poder borrarlo luego y evitar que parpadee
         let graficoProduccionObj = null;
 
         function renderizarGrafico() {
+            // Pregunta a la base de datos qué conejos han producido más dinero
             fetch('controllers/controladorEstadisticas.php')
                 .then(res => res.json())
                 .then(response => {
                     if (response.status !== 'success') return;
 
+                    //Buscamos dónde dibujar el gráfico (la etiqueta <canvas> en el HTML)
                     const ctx = document.getElementById('graficoProduccion');
                     if (!ctx) return;
 
+                    //Si el jugador acaba de empezar y no ha contratado a nadie, mostramos un gráfico gris
                     let labels = ['Sin empleados'];
-                    let datos = [1];
+                    let datos = [1]; //sirve para que el quesito gris salga relleno al 100%
                     let colores = ['#e0e0e0'];
 
+                    //Si hay datos en la base de datos
                     if (response.data && response.data.length > 0) {
+                        //La función .map() extrae una lista limpia.
+                        //Extraemos todos los nombres
                         labels = response.data.map(item => item.nombre);
+                        //Extraemos la suma total de dinero que aporta cada TIPO de empleado
                         datos = response.data.map(item => parseFloat(item.produccionTotal));
                         colores = ['#5D4037', '#8D6E63', '#D7CCC8', '#A1887F', '#3E2723', '#FFC107', '#81C784', '#FF8A65'];
                     }
 
+                    //Si ya había un gráfico dibujado antes, lo destruimos para que el nuevo no se solape
                     if (graficoProduccionObj) {
                         graficoProduccionObj.destroy();
                     }
 
+                    //Llamamos a la librería externa Chart.js para que genere el dibujo
                     graficoProduccionObj = new Chart(ctx, {
-                        type: 'doughnut',
+                        type: 'doughnut', //Gráfico tipo donut
                         data: {
-                            labels: labels,
+                            labels: labels, //Los nombres de la leyenda
                             datasets: [{
-                                data: datos,
-                                backgroundColor: colores,
-                                borderWidth: 2,
+                                data: datos, //Los porcentajes de cada gajo
+                                backgroundColor: colores, //Los colores de cada gajo
+                                borderWidth: 2, //Grosor de la línea blanca que separa los gajos
                                 borderColor: '#fffafa'
                             }]
                         },
                         options: {
-                            responsive: true,
-                            cutout: '75%',
+                            responsive: true, //Para que no se rompa al verlo en el móvil
+                            cutout: '75%', //Define el grosor del donut
                             plugins: {
-                                legend: { 
-                                    position: 'bottom',
-                                    labels: { font: { family: 'Arial', size: 12 } }
+                                legend: {
+                                    position: 'bottom', //Pone los nombres debajo del dibujo
+                                    labels: {
+                                        font: {
+                                            family: 'Arial',
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed !== null) {
+                                                label += context.parsed + ' m/s';
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -427,17 +512,19 @@
             document.querySelectorAll('.seccion-ajustes').forEach(seccion => {
                 seccion.style.display = 'none';
             });
-            
+
             document.querySelectorAll('.tab-ajustes-btn').forEach(btn => {
                 btn.style.borderBottom = '3px solid transparent';
                 btn.style.color = '#8D6E63';
             });
-            
+
             document.getElementById(idTab).style.display = 'block';
+            
             botonPulsado.style.borderBottom = '3px solid #5D4037';
             botonPulsado.style.color = '#5D4037';
         }
     </script>
     <div id="toast-container"></div>
 </body>
+
 </html>
