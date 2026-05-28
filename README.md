@@ -42,7 +42,7 @@ Solo necesitas tener Docker y Git instalados en tu ordenador.
 
 ---
 
-### 🎮 Funcionalidades principales
+### Funcionalidades principales
 * **Sistema de usuarios:** Registro, inicio de sesión y guardado de progreso continuo en base de datos.
 * **Economía matemática:** Tienda para comprar conejos (ingresos pasivos) y utensilios (mejoran el clic). El coste de los objetos escala exponencialmente con cada compra para balancear el juego.
 * **Mecánica de limpieza (Penalización):** Los clics manuales ensucian la cafetería. Si se ensucia demasiado (50 clics sucios), la producción pasiva recibe una penalización del 50% hasta que se pague la tasa de limpieza.
