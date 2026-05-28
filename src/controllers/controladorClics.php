@@ -1,5 +1,5 @@
 <?php
-//Encargado de
+//Encargado de procesar los clics
 session_start();
 require_once '../db.php';
 require_once '../models/MotorJuego.php';

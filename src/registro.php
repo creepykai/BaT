@@ -1,8 +1,5 @@
 <?php
-/**
- * Controlador que procesa el registro de nuevos usuarios.
- * Recibe el formulario POST, valida el email y delega en el GestorAutenticacion.
- */
+//Encargado de procesar el registro de nuevos usuarios
 require_once 'db.php';
 require_once 'models/GestorAutenticacion.php';
 
