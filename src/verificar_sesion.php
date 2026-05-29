@@ -1,5 +1,5 @@
 <?php
-//Middleware de autenticación comprueba si el usuario está logueado
+//Middleware de autenticación, comprueba si el usuario está logueado
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

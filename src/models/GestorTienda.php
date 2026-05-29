@@ -87,6 +87,7 @@ class GestorTienda {
 
     public function comprarUtensilio($usuarioId, $utensilioId) {
         try {
+            //ACID
             $this->pdo->beginTransaction();
 
             $stmtU = $this->pdo->prepare("SELECT costeBase, limiteMax FROM utensilio WHERE utensilioId = ?");

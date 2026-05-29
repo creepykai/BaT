@@ -18,8 +18,8 @@
     <?php echo $mensaje; ?>
     
     <form method="POST">
-        <input type="email" name="email" placeholder="tu@correo.com" required><br>
-        <input type="password" name="password" placeholder="Crea una contraseña" required><br>
+        <input type="email" name="email" required><br>
+        <input type="password" name="password" required><br>
         <button type="submit">Registrarse</button>
     </form>
     

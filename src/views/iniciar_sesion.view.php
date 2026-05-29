@@ -19,8 +19,8 @@
     <?php if($error) echo "<p style='color:red;'>$error</p>"; ?>
 
     <form id="main-form" method="POST" action="iniciar_sesion.php" enctype="multipart/form-data">
-        <input type="email" name="email" id="email" placeholder="tu@correo.com" required><br>
-        <input type="password" name="password" id="password" placeholder="Tu contraseña" required><br>
+        <input type="email" name="email" id="email" required><br>
+        <input type="password" name="password" id="password" required><br>
         <button type="submit">Entrar</button>
         
         <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">

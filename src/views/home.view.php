@@ -146,7 +146,7 @@
 
             <div id="tab-opciones" class="seccion-ajustes" style="display: none; text-align: center; padding-top: 20px;">
                 <button id="btn-reiniciar-partida" class="btn-config btn-peligro">Reiniciar Partida</button>
-                <button onclick="descargarPartida()" class="btn-config" style="background-color: #5d4037; color: white; border:none; cursor:pointer; font-family: 'Fredoka One', cursive;">Descargar Partida (.json)</button>
+                <button onclick="descargarPartida()" class="btn-config" style="background-color: #5d4037; color: white; border:none; cursor:pointer;">Descargar Partida (.json)</button>
                 <a href="cerrar_sesion.php" class="btn-config btn-salir">Cerrar Sesión</a>
             </div>
 
@@ -275,8 +275,7 @@
         }
 
         setInterval(() => {
-            //Cada 3 segundos si se han pulsado clics, se suman a la cuenta
-            //Tambien actualiza la suciedad y los logros 
+            //Cada 3 segundos si se han pulsado clics, se suman a la cuenta. Tambien actualiza la suciedad y los logros 
             if (clicsPendientes > 0) {
                 let clicsAEnviar = clicsPendientes;
                 clicsPendientes = 0;
